@@ -15,6 +15,7 @@ public class ChoiceMonkeysKing {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		// 约瑟夫问题
 		System.out.println("猴子选猴王");
 		
 		System.out.print("请输入猴子的总数：");
@@ -101,6 +102,7 @@ public class ChoiceMonkeysKing {
 				return i + 1;
 			}
 		}
+
 		return 0;
 	}
 }
