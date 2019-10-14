@@ -17,7 +17,8 @@ public class LotteryRandomGenerator {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		
+		// 按照给定的范围及要求随机生成彩票
+
 		System.out.printf("彩票生成器\n");
 		System.out.print("请输入生成的数字范围：");
 		Scanner numberRangeScanner = new Scanner(System.in);
