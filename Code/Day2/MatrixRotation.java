@@ -15,6 +15,8 @@ public class MatrixRotation {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		// 将任意数的阶乘旋转90°排列
+		
 		System.out.print("请输入任意数字：");
 		Scanner inputNumberScanner = new Scanner(System.in);
 		int inputNumber = inputNumberScanner.nextInt();
