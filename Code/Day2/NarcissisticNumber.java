@@ -15,15 +15,13 @@ public class NarcissisticNumber {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		// 求某长度的水仙花数
-		
 		long startTime = System.currentTimeMillis();   //获取开始时间
 		
-		Integer startNumber = 100;
-		Integer numberRange = 1;
+		long startNumber = 100;
+		long numberRange = 1;
 		System.out.print("请输入要搜索水仙花数的长度范围（3-10）:");
 		Scanner r = new Scanner(System.in);
-		Integer range = r.nextInt();
+		long range = r.nextInt();
 		
 		if (range < 3 || range > 10) {
 			System.out.println("超出搜索范围！");
@@ -33,16 +31,16 @@ public class NarcissisticNumber {
 		}
 		
 		
-		for (Integer i = 0; i < range; i++) {
+		for (long i = 0; i < range; i++) {
 			numberRange *= 10;
 		}
 		
 		System.out.println("Loading.......");
 		
-		for (int j = startNumber; j <= numberRange-1; j++) {
-			Integer temporaryNumber = j;
-			Integer disposeNumber = 0;
-			Integer total = 0;
+		for (long j = startNumber; j <= numberRange-1; j++) {
+			long temporaryNumber = j;
+			long disposeNumber = 0;
+			long total = 0;
 			
 			while (temporaryNumber != 0) {
 				
@@ -51,12 +49,12 @@ public class NarcissisticNumber {
 				//System.out.println("Dispose:" + disposeNumber);
 				temporaryNumber /= 10;
 				temporaryNumber *= 10;
-				Integer digitalNumber = disposeNumber - temporaryNumber;
+				long digitalNumber = disposeNumber - temporaryNumber;
 				
 				//System.out.println("Digital:" + digitalNumber);
-				Integer digitalNumberPower = 1;
+				long digitalNumberPower = 1;
 				
-				for (Integer i = 0; i < range; i++) {
+				for (long i = 0; i < range; i++) {
 					digitalNumberPower *= digitalNumber;
 				}
 				
