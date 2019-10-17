@@ -15,6 +15,7 @@ public class NarcissisticNumber {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		// 水仙花数
 		long startTime = System.currentTimeMillis();   //获取开始时间
 		
 		long startNumber = 100;
