@@ -13,7 +13,7 @@ import java.util.Scanner;
  * @author CAI
  *
  */
-public class MoreDateAndTime6601 {
+public class MoreBirthDay6601 {
 
 	/**
 	 * @param args
@@ -23,6 +23,9 @@ public class MoreDateAndTime6601 {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("请按月-日的格式输入生日：");
 		String str = scanner.next();
+		scanner.close();
+		
+		// 将用户输入的月日解析成一个MonthDay对象
 		MonthDay day = MonthDay.parse(str, formatter);
 		LocalDate today = LocalDate.now();
 		
@@ -44,7 +47,7 @@ public class MoreDateAndTime6601 {
 		} else {
 			System.out.println("已过" + result + "天，等待来年！");
 		}
-		System.out.println(result);
+
 	}
 
 }
