@@ -156,7 +156,7 @@ public class TaskKTVSelect6601 {
 			// 先删除该歌曲
 			list.remove(index);
 			// 在将该歌曲在其前一位插入
-			list.add(index + 1, name);
+			list.add(index - 1, name);
 			System.out.println("已将歌曲【" + name + "】" + "前移一位");
 
 		} else {
