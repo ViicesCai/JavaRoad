@@ -12,6 +12,33 @@ E --> H[POWER]
 F --> I[SPARC]
 ```
 
+## 认识JVM、JRE、JDK
+
+### 1.JVM：Java Virtual Machine
+
++ Java虚拟机，只识别*.class的文件。
+
++ Java跨平台的核心。
+
++ Java语言一次编译，到处运行，适合异构系统环境，是一门跨平台的语言。
+
+### 2.JRE：Java Runtime Environment
+
++ Java运行环境，包含：JVM和相关库。
+
++ JRE = Windows
+
+### 3.JDK：Java Development Kit
+
++ Java开发工具包，包含编译器、源代码、API文档及完整的JRE。
+
++ JDK是整个Java开发的核心。
+
++ JDK = Visual Studio + Windows
+  + SE (J2SE) 标准版，常用此版本。主要用于桌面应用开发，是Java的基础。
+  + EE (J2EE) 企业版，用于开发J2EE应用。
+  + ME (J2ME) 用于开发移动、嵌入式设备的应用。
+
 # 配置Java开发环境
 
 ## 1. 下载JDK
@@ -33,6 +60,12 @@ F --> I[SPARC]
 新建变量名：CLASSPATH，变量值：.;%JAVA_HOME%\lib;%JAVA_HOME%\lib\tools.jar
 
 ![img](https://images2018.cnblogs.com/blog/1313907/201805/1313907-20180505160714794-1912853159.png)
+
+新建两条路径：%JAVA_HOME%\bin %JAVA_HOME%\jre\bin
+
+![img](https://www.runoob.com/wp-content/uploads/2018/08/1534411240-7448-3932295-515fd020c1e2fc4a.png)
+
+
 
 保存完毕后打开CMD，分别输入java -version；javac -version能正常运行则表示配置成功。
 
