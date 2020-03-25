@@ -13,7 +13,6 @@ public class OperationAdd extends Operation {
 
 	@Override
 	public double getResult() {
-		System.out.println("number1:" + number1 + "number2" + number2);
 		return number1 + number2; // 返回两数之和
 	}
 }

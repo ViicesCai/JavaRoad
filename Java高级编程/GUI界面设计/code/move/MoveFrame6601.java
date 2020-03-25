@@ -42,10 +42,16 @@ public class MoveFrame6601 extends JFrame {
 		p.add(btnMove);
 		this.add(p);
 		
-		// 为事件源注册监听对象
+		// 创建监听对象 
 		MyMouseAdapter6601 myMouseAdapter = new MyMouseAdapter6601();
-		p.addMouseListener(myMouseAdapter);
-		p.addMouseMotionListener(myMouseAdapter);
+
+		// 为事件源注册监听对象
+		btnMove.addMouseListener(myMouseAdapter);
+		btnMove.addMouseMotionListener(myMouseAdapter);
+		lblName.addMouseListener(myMouseAdapter);
+		lblName.addMouseMotionListener(myMouseAdapter);
+		textName.addMouseListener(myMouseAdapter);
+		textName.addMouseMotionListener(myMouseAdapter);
 	}
 
 	public static void main(String[] args) {
