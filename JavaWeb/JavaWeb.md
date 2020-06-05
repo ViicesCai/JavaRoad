@@ -700,11 +700,11 @@ C：Controller，控制器
 
 ### 使用 Eclipse 自动生成
 
-![image-20200530094130785](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200530094130785.png)
+![image-20200530094130785](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200530094130785.png)
 
-![image-20200530094235430](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200530094235430.png)
+![image-20200530094235430](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200530094235430.png)
 
-![image-20200530094338792](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200530094338792.png)
+![image-20200530094338792](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200530094338792.png)
 
 ## 项目根目录
 
