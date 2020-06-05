@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 # Tomcat
 
 默认端口为：8080
@@ -136,11 +128,11 @@ tomcat/conf/Catalina/localhost 中新建：项目名.xml，添加此语句
 
 Window -> Preferences -> Server -> Runtime Environments
 
-![image-20200501194638160](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501194638160.png)
+![image-20200501194638160](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501194638160.png)
 
 通过 Add 添加自己的 Tomcat 版本
 
-![image-20200501195011189](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501195011189.png)
+![image-20200501195011189](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195011189.png)
 
 Next，将自己的 Tomcat 添加进来，Browse 选择 Tomcat 的路径，然后 Finish
 
@@ -148,7 +140,7 @@ Next，将自己的 Tomcat 添加进来，Browse 选择 Tomcat 的路径，然�
 
 + 如果这里没有JDK 点击左侧 Installed JREs
 
-![image-20200501195059412](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501195059412.png)
+![image-20200501195059412](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195059412.png)
 
 + 将自己的JDK版本添加进来
 
@@ -156,15 +148,15 @@ Next，将自己的 Tomcat 添加进来，Browse 选择 Tomcat 的路径，然�
 
 点击此处
 
-![image-20200501195353643](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501195353643.png)
+![image-20200501195353643](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195353643.png)
 
 + 选择自己刚刚添加的 Tomcat 版本：选择的版本必须和之前关联的一致
 
-  ![image-20200501195453176](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501195453176.png)
+  ![image-20200501195453176](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195453176.png)
 
 + 点击Next，Finsh(这里没有可用的项目是因为咱们没有创建JSP项目)
 
-![image-20200501195658107](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501195658107.png)
+![image-20200501195658107](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195658107.png)
 
 + 成功后自动生成一个 Servers 文件夹用于配置（Tomcat：只是将Tomcat的一些配置内容复制过来而已，在这里配置文件并不会影响到对应目录的配置，仅仅在当前项目下有效）
 
@@ -176,27 +168,27 @@ Next，将自己的 Tomcat 添加进来，Browse 选择 Tomcat 的路径，然�
 
     如果你和我一样：1.先关闭服务 2.右键项目（只有配置了项目才能启动服务器）Remove 3.双击该Server
 
-    ![image-20200501200141107](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501200141107.png)
+    ![image-20200501200141107](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501200141107.png)
 
 ### 创建 JSP 项目
 
-![image-20200501200747170](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501200747170.png)
+![image-20200501200747170](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501200747170.png)
 
-![image-20200501200907748](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501200907748.png)
+![image-20200501200907748](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501200907748.png)
 
-![image-20200501200925116](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501200925116.png)
+![image-20200501200925116](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501200925116.png)
 
-![image-20200501200948601](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501200948601.png)
+![image-20200501200948601](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501200948601.png)
 
-![image-20200501201124518](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501201124518.png)
+![image-20200501201124518](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501201124518.png)
 
-![image-20200501201150128](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501201150128.png)
+![image-20200501201150128](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501201150128.png)
 
 此时已经可以开启服务并通过端口访问
 
 项目结构如下：通过修改`welcome-file`修改默认访问的文件
 
-![image-20200501201231089](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200501201231089.png)
+![image-20200501201231089](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501201231089.png)
 
 #### 统一字符集编码
 
@@ -458,7 +450,7 @@ void removeAttribute(String name); // 根据属性名，删除对象
 
 可以为多种关系型数据库 DBMS 提供统一的访问方式，用 Java 操作数据库
 
-![image-20200505114706139](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200505114706139.png)
+![image-20200505114706139](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200505114706139.png)
 
 ### JDBC API
 
@@ -630,7 +622,7 @@ C：Controller，控制器
 
 ## 处理流程
 
-![image-20200530084944766](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200530084944766.png)
+![image-20200530084944766](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200530084944766.png)
 
 # Servlet
 
@@ -777,7 +769,7 @@ C：Controller，控制器
 
 ### 继承关系
 
-![image-20200530112933586](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200530112933586.png)
+![image-20200530112933586](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200530112933586.png)
 
 + `ServletConfig：接口`
 
@@ -852,7 +844,7 @@ C：Controller，控制器
 
 ### Service
 
-![](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200530122018387.png)
+![](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200530122018387.png)
 
 + 所以仅仅继承 HttpServlet 就可以重写某一个方法，而不用全部重写
 + Eclipse 可以直接创建 servlet
@@ -891,7 +883,7 @@ application: request.getServletContext();
 
 ## 三层间的关系
 
-![image-20200530221608117](C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200530221608117.png)
+![image-20200530221608117](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200530221608117.png)
 
 + 上层将请求传递给下层，下层处理后返回给上层
 + 上层依赖于下层：持有成员变量即必须先有数据库才可能存在DAO，DAO依赖于数据库
