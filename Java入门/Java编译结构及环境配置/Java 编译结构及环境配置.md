@@ -45,7 +45,7 @@ F --> I[SPARC]
 
 [下载地址](https://www.oracle.com/technetwork/java/javase/downloads/jdk13-downloads-5672538.html)
 
-![](C:\Users\Vivi_\Downloads\火狐截图_2019-10-04T08-06-43.588Z.png)
+![](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/火狐截图_2019-10-04T08-06-43.588Z.png)
 
 按照自己的系统选择相应的版本。
 
@@ -81,7 +81,7 @@ F --> I[SPARC]
 
 选择 Java Project
 
-<img src="C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200215113900135.png" alt="image-20200215113900135" style="zoom: 67%;" />
+<img src="https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200215113900135.png" alt="image-20200215113900135" style="zoom: 67%;" />
 
 
 
@@ -91,7 +91,7 @@ Project name：输入自定义的项目名称
 
 Package 表示一个包名 也就是一个文件夹的名称
 
-<img src="C:\Users\Vivi_\AppData\Roaming\Typora\typora-user-images\image-20200215114251863.png" alt="image-20200215114251863" style="zoom:80%;" />
+<img src="https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200215114251863.png" alt="image-20200215114251863" style="zoom:80%;" />
 
 这里类名为 Tester
 
