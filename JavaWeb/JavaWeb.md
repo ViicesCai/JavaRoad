@@ -152,7 +152,7 @@ Next，将自己的 Tomcat 添加进来，Browse 选择 Tomcat 的路径，然�
 
 + 选择自己刚刚添加的 Tomcat 版本：选择的版本必须和之前关联的一致
 
-  ![image-20200501195453176](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195453176.png)
+  ![](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195429625.png)
 
 + 点击Next，Finsh(这里没有可用的项目是因为咱们没有创建JSP项目)
 
@@ -959,6 +959,8 @@ application: request.getServletContext();
   + 使用 form 表单
 
     ``` jsp
+    <!-- 表单提交方式必须为 post（get 有长度限制）-->
+    <!-- 必须使用 enctype -->
     <form action="UploadServlet" method="post" enctype="multipart/form-data">
     	上传照片：<input type="file" name="spicture"><br>
         <input type="submit" value="提交">
@@ -969,4 +971,123 @@ application: request.getServletContext();
 
   + 上传到相应目录
   + 限制上传的文件类型、大小
+  + 注意：如果上传的目录在项目下则修改代码服务重启时内容会被清空
+    + tomcat 在修改代码时会重新编译，在下次重启时会重新部署，所有的目录会被重建
+    + 为了防止上传目录丢失
+      + 使用虚拟路径，将该目录映射到别处
+      + 上传到非 tomcat 目录
+
+[项目地址](https://github.com/ViicesCai/JavaRoad/blob/master/JavaWeb/code/UpAndDown/src/student/servlet/UploadServlet.java)
+
+## 下载
+
+> 无需依赖任何 jar 包
+
+### 实现
+
+1. 请求 Servlet
+
+2. Servlet 通过文件的地址，将文件转为输入流 读取到 Servlet 中
+
+3. 通过输出流将已经转为输入流的文件输出给用户
+
+   + 注意：下载文件需要注意两个响应头
+
+     ``` java
+     response.addHeader("contentType", "application/octet-stream"); // 格式：二进制文件
+     response.addHeader("content-Disposition", "attachement;filename=" + fileName); // fileName 包含了文件后缀
+     ```
+
+     ![image-20200606182300363](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200606182300363-1591439503374.png)
+
+4. 中文乱码问题
+
+   + 需要进行转码
+
+     ``` java
+     // Edge
+     response.addHeader("content-Disposition", "attachement;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+     
+     // FireFox
+     response.addHeader("content-Disposition", "attachement;filename==?UTF-8?B?" + new String(Base64.encodeBase64(fileName.getBytes("UTF-8"))) + "?=");
+     ```
+
+[项目地址]("https://github.com/ViicesCai/JavaRoad/blob/master/JavaWeb/code/UpAndDown/src/student/servlet/DownloadServlet.java")
+
+# EL表达式语法
+
+> EL:Expression Language,可以替代 JSP 页面中的 Java 代码
+>
+> 在 jsp 页面中插入 java代码获取数据过于麻烦，需要对 request中的数据做类型转换
+
+``` java
+// ELInitServlet.java
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    String str = "Hello,BeautifulWorld!";
+    String[] books = {"设计模式", "数据结构与算法", "EffectiveJava"};
+    
+    Map<String, String> country = new HashMap<String, String>();
+	country.put("cn", "中国");
+	country.put("us", "美国");
+    
+	request.setAttribute("info", str);
+    request.setAttribute("books", books);
+    request.setAttribute("country", country);
+	request.getRequestDispatcher("el.jsp").forward(request, response);
+}
+```
+
+``` jsp
+// el.jsp
+<body>
+    ${域对象.域对象中的属性.属性.(级联属性)}
+    ${requestScope.info}
+    ${[''] 或 [""]}
+    ${requestScope['info']} // 此种方式可以包含特殊字符（推荐使用）也可以放置变量
+    // 数组
+    ${requestScope.books[0]} <br>
+	${requestScope.books[2]} <br>
+    
+    // map
+    ${requestScope.country.cn } <br>
+	${requestScope.country["us"] } <br>
+</body>
+```
+
+### 隐式对象
+
+> 无需 new 即可使用的对象（自带对象)
+
++ 作用域访问对象(EL 域对象)
+
+  + `pageScope`
+  + `requestScope`
+  + `sessionScope`
+  + `applicationScope`
+  + 不指定对象，则默认按照此顺序依次取值
+
++ 参数访问对象：获取表单数据
+
+  + `request.getParameter()`:${param}
+  + `request.getParameterValues()`:${paramValues}
+
+  ``` html
+  // html
+  <form>
+      用户名：<input name="uname" type="text"> <br>
+      密码:<input name="upwd" tyoe=text> <br>
+  </form>
+  ```
+
+  ```php
+  ${param.uname}; // 获取from 表单中的 uname
+  ```
+
++ 隐式对象
+
+  + pageContext：获取影式对象
+
+    `${pageContext.session()}` : 无需 get 将方法改成全小写
+
+    支持级联
 
