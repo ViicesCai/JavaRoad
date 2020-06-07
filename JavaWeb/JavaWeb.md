@@ -156,7 +156,7 @@ Next，将自己的 Tomcat 添加进来，Browse 选择 Tomcat 的路径，然�
 
 + 点击Next，Finsh(这里没有可用的项目是因为咱们没有创建JSP项目)
 
-![image-20200501195658107](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195658107.png)
+  ![image-20200501195658107](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195658107.png)
 
 + 成功后自动生成一个 Servers 文件夹用于配置（Tomcat：只是将Tomcat的一些配置内容复制过来而已，在这里配置文件并不会影响到对应目录的配置，仅仅在当前项目下有效）
 
@@ -1054,7 +1054,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
 </body>
 ```
 
-### 隐式对象
+## 隐式对象
 
 > 无需 new 即可使用的对象（自带对象)
 
@@ -1089,5 +1089,848 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
 
     `${pageContext.session()}` : 无需 get 将方法改成全小写
 
-    支持级联
+    + 支持级联
+
+## JSTL
+
+> 比 EL 更加强大：需要引入 jstl.jar standard.jar
+
+``` jsp
+<!-- 在jsp页面头部需要引入 tablib，prefix：前缀 -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+```
+
+### 核心标签库
+
++ 通用标签库
+
+  + `<c(prefix):set />`赋值
+
+    + 在某个作用域（Scope:四个作用域）中，给某个变量赋值
+
+    ``` jsp
+    <c:set var="name" value="Cai" scope="request"/> <!-- 赋值 -->
+    ${requestScope.name } <br> <!--- 取值 ->
+    ```
+
+    + 给某个对象的属性赋值
+
+    ``` jsp
+    Student student = new Student("Cai", 22);
+    
+    当前对象：${requestScope.student.name} <br>
+    <!-- target已经有明确的作用于范围了，无需指定作用域 -->
+    <c:set target="${requestScope.student}" property="name" value="ViicesCAI"/>
+    当前对象：${requestScope.student.name} <br>
+    ```
+
+    + 给 Map 对象赋值
+
+    ``` jsp
+    Map<String, String> country = new HashMap<String, String>();
+    country.put("cn", "中国");
+    country.put("us", "美国");
+        
+    ${requestScope.country.cn} <br>
+    <c:set target="${requestScope.country}" property="cn" value="中华人民共和国"/>
+    ${requestScope.country.cn} <br>
+    ```
+
+    + 给不存在的变量赋值
+
+    ``` jsp
+    <c:set var="school" value="福州大学" scope="request" />
+    ${requestScope.school } <br>
+    ```
+
+  + `<c:out />`输出
+
+    + 显示数据
+
+    ``` jsp
+    <c:out value="${requestScope.student}" /> <br>
+    ```
+
+    + 显示不存在的数据
+
+    ``` jsp
+    <c:out value="${requestScope.stu}" default="HHH" /> <br>
+    
+    <a href="https:www.baidu.com">百度</a> <br>
+    true:<c:out value='<a href="https:www.baidu.com">百度</a>' escapeXml="true" /> <br>
+    false:<c:out value='<a href="https:www.baidu.com">百度</a>' escapeXml="false" /> <br>
+    ```
+
+  + `<c:remove />`删除
+
+    ``` jsp
+    <c:out value="${student.name }" default="被删除了" /> <br>
+    <c:remove var="student" scope="request"/> 
+    <c:out value="${student.name }" default="被删除了" /> <br>
+    ```
+
++ 条件标签库
+
+  + `<c:if test="">`单重选择
+
+    ``` jsp
+    <c:if test="${10 > 2 }" var="result" scope="request">
+        结果为：${result}
+    </c:if>
+    ```
+
+  + `<c:choose>`多重选择：类似 Switch
+
+    ``` jsp
+    <c:choose>
+        <c:when test="${requestScope.role == '老师' }">
+    	老师 code ...
+    	</c:when>
+    		
+    	<c:when test="${requestScope.role == '学生' }">
+    	学生 code ...
+    	</c:when>
+    		
+    	<c:when test="${requestScope.role eq '家长' }">
+    	家长 code ...
+    	</c:when>
+    		
+    	<c:otherwise>
+    	管理员 ...
+    	</c:otherwise>
+    </c:choose>
+    ```
+
++ 迭代（循环）标签库
+
+  + `<c:forEach begin="" end="" step=""`
+
+    ```jsp
+    --- for循环 <br>
+    <c:forEach begin="0" end="5" step="1" varStatus="status">
+    ${status.index}Hello <br>
+    </c:forEach>
+    
+    String[] books = {"设计模式", "数据结构与算法", "EffectiveJava"};
+    --- 遍历集合 <br>
+    <c:forEach var="book" items="${requestScope.books}">
+    ${book } <br>
+    </c:forEach>
+    ```
+
+[项目地址](https://github.com/ViicesCai/JavaRoad/blob/master/JavaWeb/code/ELProject)
+
+# 过滤器（拦截器）
+
+> 请求、响应时都会被过滤器拦截
+>
+> 等待过滤器允许通过
+
+![image-20200607132802977](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200607132802977.png)
+
+## 配置过程
+
+### 实现一个 Filter 接口
+
+``` java
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+/**
+ * 要将一个普通的类变成一个具有特定功能的类（如：过滤器、拦截器...）
+ * 1.继承父类 2.实现一个接口 3.增加一个注解
+ * 
+ * @author CAI
+ *
+ */
+
+public class MyFilter implements Filter { // 过滤器：执行时机同 servlet
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		System.out.println("初始化");
+	}
+	
+	@Override
+	public void doFilter(ServletRServequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException { // 处理拦截
+		System.out.println("拦截请求");
+		chain.doFilter(request, response); // 放行
+		System.out.println("拦截响应");
+	}
+
+	@Override
+	public void destroy() {
+		System.out.println("销毁");
+	}
+}
+```
+
+### 配置过滤器
+
+> 以 Eclipse为例，可以直接创建过滤器，编译器会自动配置
+
+``` xml
+web.xml
+
+配置 filter 映射关系
+<filter>
+  <filter-name>MyFilter</filter-name> <!-- 过滤器名 -->
+  <filter-class>student.filter.MyFilter</filter-class> <!-- 包名 -->
+</filter>
+<filter-mapping>
+  <filter-name>MyFilter</filter-name>
+  <url-pattern>/MyServlet</url-pattern> <!-- 拦截访问 MyServlet的请求 -->
+  <!-- <url-pattern>/*</url-pattern> 拦截一切请求：该项目内的所有请求都会被拦截 --> 
+  <dispatcher>通配符</dispatcher> <!--请求方式-->
+</filter-mapping>
+```
+
++ 通配符
+  + REQUEST：拦截 HTTP 请求（GET、POST）
+  + FORWARD：拦截通过请求转发方式的请求
+  + INCLUDE：拦截通过 request.getRequestDispatcher("").include()、通过<jsp:include page="..." /> 发出的请求
+  + ERROR：拦截通过 <error-page> 发出的请求
+
+## 区别
+
++ 过滤器中 `doFiler(ServletRServequest request)`
++ Servlet中`HttpServletRequest request`
++ 父子关系
+
+## 过滤器链
+
+> 可以配置多个过滤器，先后顺序由 <filter-mapping> 的位置决定
+
+# 监听器
+
+> 类似 js：onlick=""
+>
+> 主要对象：request session application
+
++ request：ServletRequestListener
++ session：HttpSessionListener
++ application：ServletContextListener
++ 每个监听器各自提供了两个方法：监听开始、监听结束
+
+## 配置过程
+
+### 实现监听对象对应的 Listener 接口
+
+``` java
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+
+/**
+ * 根据监听的对象实现不同的接口
+ 
+ * @author CAI
+ */
+public class ContextSessionRequestListener implements ServletContextListener, HttpSessionListener, ServletRequestListener {
+
+	// request
+    public void requestInitialized(ServletRequestEvent sre)  { 
+    	System.out.println("监听ServletRequestEvent，创建监听对象：" + sre);
+    }
+    
+    public void requestDestroyed(ServletRequestEvent sre)  { 
+    	System.out.println("监听ServletRequestEvent，销毁监听对象：" + sre);
+    }
+    
+    // session
+	public void sessionCreated(HttpSessionEvent se) {
+    	System.out.println("监听HttpSessionEvent，创建监听对象：" + se);
+	}
+	
+    public void sessionDestroyed(HttpSessionEvent se)  { 
+    	System.out.println("监听HttpSessionEvent，销毁监听对象：" + se);
+    }
+
+    
+	// application(ServletContext)
+    public void contextInitialized(ServletContextEvent sce)  { 
+    	System.out.println("监听ServletContext，创建监听对象：" + sce);
+    }
+    
+    public void contextDestroyed(ServletContextEvent sce)  { 
+    	System.out.println("监听ServletContext，销毁监听对象：" + sce);
+    }
+}
+```
+
+### 配置监听器
+
+> 以 Eclipse为例，可以直接创建监听器，编译器会自动配置
+
+``` xml
+web.xml
+
+配置监听器
+<listener>
+    <listener-class>student.listener.ContextSessionRequestListener</listener-class>
+</listener>
+```
+
+## 执行过程
+
+``` jsp
+// session.jsp
+<body>
+	<a href="sessionInvalidate.jsp">Session失效</a>
+</body>
+```
+
+``` jsp
+<%
+	out.println("====Session销毁页面====");
+	session.invalidate();
+%>
+```
+
+1. Servlet 启动时，自动创建 ServletContext
+
+2. 访问 session.jsp
+
+   ![image-20200607145108873](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200607145108873.png)
+
+3. 点击超链接
+
+   ![image-20200607145610589](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200607145610589.png)
+
+## 监听对象中属性的变更
+
++ request：ServletRequestAttributeListener
++ session：HttpSessionAttributeListener
++ application：ServletContextAttributeListener
+
+#### 配置过程
+
+##### 实现监听属性变更的接口
+
+``` java
+import javax.servlet.ServletContextAttributeEvent;
+import javax.servlet.ServletContextAttributeListener;
+import javax.servlet.ServletRequestAttributeEvent;
+import javax.servlet.ServletRequestAttributeListener;
+import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionBindingEvent;
+
+/**
+ * 属性变更监听
+ * 
+ * @author CAI
+ *
+ */
+public class AttributeListenr implements ServletRequestAttributeListener, 
+HttpSessionAttributeListener, ServletContextAttributeListener {
+	
+	@Override
+	public void attributeAdded(ServletContextAttributeEvent scae) {
+		String name = scae.getName(); // 当前正在操作的属性名
+		Object value = scae.getServletContext().getAttribute(name);
+		
+		System.out.println("ServletContext[增加]属性：属性名：" + name + 
+				",属性值：" + value + "\n");
+	}
+	
+	@Override
+	public void attributeRemoved(ServletContextAttributeEvent scae) {
+		System.out.println("ServletContext[删除]属性：属性名：" + scae.getName() + "\n");
+	}
+	
+	@Override
+	public void attributeReplaced(ServletContextAttributeEvent scae) {
+		String name = scae.getName(); // 当前正在操作的属性名
+		Object value = scae.getServletContext().getAttribute(name);
+		
+		System.out.println("ServletContext[替换]属性：属性名：" + name + 
+				",属性值：" + value + "\n");
+	}
+	
+	@Override
+	public void attributeAdded(HttpSessionBindingEvent se) {
+		String name = se.getName(); // 当前正在操作的属性名
+		Object value = se.getSession().getAttribute(name);
+		
+		System.out.println("HttpSession[增加]属性：属性名：" + name + 
+				",属性值：" + value + "\n");
+	}
+	
+	@Override
+	public void attributeRemoved(HttpSessionBindingEvent se) {
+		System.out.println("HttpSession[删除]属性：属性名：" + se.getName() + "\n");
+	}
+	
+	@Override
+	public void attributeReplaced(HttpSessionBindingEvent se) {
+		String name = se.getName(); // 当前正在操作的属性名
+		Object value = se.getSession().getAttribute(name);
+		
+		System.out.println("HttpSession[替换]属性：属性名：" + name + 
+				",属性值：" + value + "\n");
+	}
+	
+	@Override
+	public void attributeAdded(ServletRequestAttributeEvent srae) {
+		String name = srae.getName(); // 当前正在操作的属性名
+		Object value = srae.getServletRequest().getAttribute(name);
+		
+		System.out.println("ServletRequest[增加]属性：属性名：" + name + 
+				",属性值：" + value + "\n");
+	}
+	
+	@Override
+	public void attributeRemoved(ServletRequestAttributeEvent srae) {
+		System.out.println("ServletRequest[删除]属性：属性名：" + srae.getName() + "\n");
+	}
+	
+	@Override
+	public void attributeReplaced(ServletRequestAttributeEvent srae) {
+		String name = srae.getName(); // 当前正在操作的属性名
+		Object value = srae.getServletRequest().getAttribute(name);
+		
+		System.out.println("ServletRequest[替换]属性：属性名：" + name + 
+				",属性值：" + value + "\n");
+	}
+}
+```
+
+##### 配置监听器
+
+``` xml
+web.xml
+
+<listener>
+    <listener-class>student.listener.AttributeListenr</listener-class>
+</listener>
+```
+
+#### 执行过程
+
+``` jsp
+// attribute.jsp
+
+<body>
+    <%
+	// ServletContext:application
+	application.setAttribute("name", "Cai"); // 增加属性
+	application.setAttribute("name", "Viices"); // 替换属性
+	application.removeAttribute("name"); // 删除属性
+		
+	// session
+	session.setAttribute("user", "user01"); // 增加属性
+	session.setAttribute("user", "user02"); // 替换属性
+	session.removeAttribute("user"); // 删除属性
+		
+	// request
+	request.setAttribute("school", "福州大学"); // 增加属性
+	request.setAttribute("school", "厦门大学"); // 替换属性
+	request.removeAttribute("school"); // 删除属性
+%>
+</body>
+```
+
+## Session 的钝化和活化
+
++ 钝化：内存 -> 硬盘
++ 活化：硬盘 -> 内存
+
+### Session 的四种状态
+
++ `session.setAttribute("name", "Cai")`：将 name 绑定到 Session 中
++ `session.removeAttribute("name")`:将 name 从 Session 中解绑
++ 钝化
++ 活化
+
+### 监听
+
++ `HttpSessionBingListener`:监听 session 对象的绑定和解绑
++ `HttpSessionActivationListener`:监听 session 对象的钝化和活化
+
+#### 实现对象的绑定和解绑
+
+``` java
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
+
+/**
+ * 绑定和解绑
+ * 
+ * @author CAI
+ *
+ */
+public class BeanListener implements HttpSessionBindingListener {
+	@Override
+	public void valueBound(HttpSessionBindingEvent event) {
+		System.out.println("绑定：Bean 对象（增加到 Session 域中），绑定对象：" + this 
+				+ "sessionID：" + event.getSession().getId() + "\n");
+	}
+	
+	@Override
+	public void valueUnbound(HttpSessionBindingEvent event) { 
+		System.out.println("解绑：Bean 对象（从 Session 域中移除），解绑对象：" + this 
+				+ "sessionID：" + event.getSession().getId() + "\n");
+	}
+}
+
+```
+
+```jsp
+// binding.jsp
+
+<%@page import="student.listener.BeanListener"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<%
+		BeanListener bean = new BeanListener();
+		session.setAttribute("bean", bean); // 绑定
+	%>
+</body>
+</html>
+```
+
++ 第一次 访问 binding.jsp 
+  + 会绑定一个 BeanListener 对象
++ 刷新时
+  + 会绑定一个 新的 BeanListener 对象
+  + 将上一个 BeanListener 对象解绑，其 sessionId 都一致
++ 原因：`BeanListener bean = new BeanListener();`
+  + 第一次创建的 BeanListener 对象被第二次创建的 BeanListener 对象覆盖了
+  + 故第一次的对象解绑了
+
+#### 实现对象的钝化和活化
+
+![image-20200607170807624](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200607170807624.png)
+
+``` java
+import java.io.Serializable;
+
+import javax.servlet.http.HttpSessionActivationListener;
+import javax.servlet.http.HttpSessionEvent;
+
+/**
+ * 钝化和活化
+ * 
+ * @author CAI
+ *
+ */
+public class BeanListener2 implements HttpSessionActivationListener, Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	// 准备被钝化、活化的数据
+	private int num;
+	private String user;
+	
+	
+	public int getNum() {
+		return num;
+	}
+
+	public void setNum(int num) {
+		this.num = num;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	// 监听时刻：即将钝化之前
+	// BeanListener2 在 session中，则该对象会随着 session 的钝化而钝化
+	@Override
+	public void sessionWillPassivate(HttpSessionEvent se) {
+		System.out.println("即将钝化之前");
+	}
+	
+	// 监听时刻：刚刚进行活化之后
+	@Override
+	public void sessionDidActivate(HttpSessionEvent se) {
+		System.out.println("即将活化之后");
+	}
+}
+
+```
+
+``` jsp
+// write.jsp
+
+<body>
+	<%
+	BeanListener2 bean = new BeanListener2();
+	bean.setNum(10);
+	bean.setUser("Cai");
+		
+	session.setAttribute("bean", bean);	
+	%>
+</body>
+```
+
+``` jsp
+// read.jsp
+
+<body>
+	从硬盘中读取 session 域中的对象（活化）:<br>
+	num:${sessionScope.bean.num }<br>
+	user:${sessionScope.bean.user }<br>
+</body>
+```
+
++ 监听对象的钝化和活化不需要配置 web.xml
+
++ 需要配置`tomcat/conf/context.xml`
+
+  ``` xml
+  <!-- 通过配置实现钝化活化 -->
+  <!-- maxIdleSwap:最大空闲时间，超过该时间，将会被钝化 -->
+  <!-- FileStore:通过该类具体实现钝化操作 -->
+  <!-- directory:相对路径（相当于根目录下该项目的绝对路径） -->
+  <Manager className="org.apache.catalina.session.PersistentManager" maxIdleSwap="5">
+      <Store className="org.apache.catalina.session.FileStore" directory="tempSession" />
+  </Manager> 
+  ```
+
+  + 重启服务然后访问 write.jsp 等待五秒（可能更久）发现控制台打印 开始钝化的信息
+    + 查看tomcat根目录下的项目文件下：出现了一个 tempSession文件夹，当中保存了一个 session 信息，即：钝化成功
+    + 以我的路径为例子：`C:\apache-tomcat-9.0.34\work\Catalina\localhost\UpAndDown\tempSession`
+  + 此时重启服务，session已不再内存中，访问 read.jsp
+    + read.jsp 读取到了 硬盘中的保存的 session 信息：活化成功
+    + session获取某对象时，如果该对象不在内存中，则直接尝试从之前钝化的文件中去获取
+  + 注意：钝化、活化即序列化、反序列化：需要实现序列化接口
+  + HttpSessionActivationListener：仅负责在 session 钝化和活化时予以监听
+  + 具体的执行是通过 `context.xml`配置而进行的
+
+# AJAX
+
+> Asynchronous JavaScript and XML：异步 Js Xml
+>
+> 异步刷新：如果网页中的某一个地方需要修改，异步刷新可以使：只刷新需要修改的地方，而页面中的其他地方不发生改变
+
+## 实现
+
+### JS：XMLHttpRequest 对象
+
+常见方法
+
++ open(方法名(提交方式：get|post), 服务器地址, true) : 与服务端建立连接
++ send()
+  + get: send(null)
+  + post: send(参数值)
++ setRequestHeader(header, value)
+  + get: 不需要设置此方法
+  + post
+    + 请求的元素中包含了文件上传：setRequestHeader("Content-Type", "multipart/form");
+      + 请求的元素中不包含文件上传：setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+对象属性
+
++ readystate: 请求状态
+
+  4：请求完毕
+
+  ![image-20200607183021080](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200607183021080.png)
+
++ status：响应状态
+
+  200：响应正常
+
+  ![image-20200607183141093](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200607183141093.png)
+
++ onreadystatechange: 回调函数
+
++ responseText: 响应格式为 String
+
++ responseXml: 响应格式为 XML
+
+[项目地址](https://github.com/ViicesCai/JavaRoad/blob/master/JavaWeb/code/Ajax)
+
+### JQuery 推荐
+
+``` java
+// MobileServlet.java
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class MobileServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+       
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		String mobile = request.getParameter("mobile");
+		
+		PrintWriter out = response.getWriter(); // 以输出流的方式发送验证消息
+		if ("18888888888".equals(mobile)) { // 验证手机：假设此时数据库中仅包含该号码
+			out.write("true");
+			
+		} else {
+			out.write("false");
+		}
+		
+		out.close();
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+}
+```
+
+``` jsp
+<body>
+    <input id="mobile"> <br>
+	<input type="button" value="注册" onclick="register()"> <br>
+</body>
+```
+
+#### 方式1
+
+``` jsp
+<script type="text/javascript" src="js/jquery-1.8.3/jquery.js"></script>
+
+<script type="text/javascript">
+    function register() {
+        var $mobile = $("#mobile").val();
+		
+		$.ajax({
+			url:"MobileServlet",// 服务器地址
+			请求方式:"post",// 也可以是 get
+			data:"mobile=" + $mobile, // 请求的数据：键值对
+			success:function(result, testStatus) {
+                
+				if (result == "true") {
+					alert("已存在！注册失败！");
+					
+				} else{
+					alert("注册成功！");
+				}
+			}, error:function(xhr, errorMessage, e) { // 可以省略
+				alert("系统异常！");
+			}
+		});
+	}
+</script>
+```
+
+#### 方式2
+
+``` jsp
+<script type="text/javascript" src="js/jquery-1.8.3/jquery.js"></script>
+
+<script type="text/javascript">
+    function register() {
+        var $mobile = $("#mobile").val();
+        
+        // $.get 和 post 一样:省略
+        $.post(
+            "MobileServlet", // 服务器地址
+			"mobile=" + $mobile, // 请求数据
+
+            function(result) {
+
+                if (result == "true") {
+                    alert("已存在！注册失败！");
+
+                } else {
+					alert("注册成功！");
+                }
+            },
+            "text" // 预期返回值类型：xml 或 json 或 text(可以省略)
+        );
+    }
+</script>
+```
+
+#### 方式3
+
+``` java
+// MobileServlet.java
+
+if ("18888888888".equals(mobile)) { // 验证手机：假设此时数据库中仅包含该号码
+    out.write("已存在！注册失败！");
+} else {
+    out.write("注册成功！");
+}
+```
+
+``` jsp
+<body>
+    <input id="mobile"> <br>
+	<input type="button" value="注册" onclick="register()"> <br>
+	<span id="tip"></span> <br>
+</body>
+```
+
+``` jsp
+<script type="text/javascript">
+    function register() {
+        var $mobile = $("#mobile").val();
+        $("#tip").load( // 将返回值结果直接加载到$()所选择的元素中
+            "MobileServlet",
+			"mobile=" + $mobile,
+        );
+    }
+</script>
+```
+
+### 方式四
+
+``` java
+// MobileServlet.java
+
+if ("18888888888".equals(mobile)) { // 验证手机：假设此时数据库中仅包含该号码
+    // out.write("true");
+    out.write("{\"msg\":\"true\"}");
+} else {
+    out.write("{\"msg\":\"false\"}");
+}
+```
+
+``` jsp
+<script type="text/javascript">
+    function register() {
+	var $mobile = $("#mobile").val();
+        $.getJSON(
+            "MobileServlet",
+			{"mobile":$mobile},
+            
+            function(result) { // {"msg":"true|false"}
+                if(result.msg == "true") {
+                    alert("已存在！注册失败！");
+                    
+                } else {
+                    alert("注册成功！");
+                }
+			}
+		);
+	}
+</script>
+```
+
+
 
