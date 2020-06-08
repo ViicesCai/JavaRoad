@@ -152,7 +152,7 @@ Next，将自己的 Tomcat 添加进来，Browse 选择 Tomcat 的路径，然�
 
 + 选择自己刚刚添加的 Tomcat 版本：选择的版本必须和之前关联的一致
 
-  ![](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195429625.png)
+  ![image-20200501195429625](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200501195429625.png)
 
 + 点击Next，Finsh(这里没有可用的项目是因为咱们没有创建JSP项目)
 
@@ -1930,6 +1930,105 @@ if ("18888888888".equals(mobile)) { // 验证手机：假设此时数据库中�
 		);
 	}
 </script>
+```
+
+### JSON的使用
+
+``` jsp
+<script type="text/javascript" src="js/jquery-1.8.3/jquery.js"></script>
+<script type="text/javascript">
+    // Json 中只有单个对象
+	function testJson() {
+        $.getJSON(
+            "JsonServlet",
+	 		{"name":"zs", "age":24},
+            function(result) {
+	 			// js 通过 eval() 将返回值转为一个 js 能识别的 json 对象
+	 			var jsonStudent = eval(result.stu1);
+                alert(jsonStudent.name + " " + jsonStudent.age);
+            }
+        );
+    }
+			
+    // Json中有多个对象
+    function testJson() {
+        $.getJSON(
+            "JsonServlet",
+			{"name":"Cai", "age":24},
+					
+            function(result) {
+                // js 通过 eval() 将返回值转为一个 js 能识别的 json 对象
+				var jsonStudents = eval(result); // Json 集合
+						
+                $.each(jsonStudents, function(i, element) {
+                    alert(this.name + " " + this.age);
+                });
+            }
+        );
+    }
+</script>
+
+<body>
+    <input id="mobile"> <br>
+	<input type="button" value="注册" onclick="register()"> <br>
+	<input type="button" value="测试json" onclick="testJson()"> <br>
+</body>
+```
+
+```java
+// JsonServlet.java
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import ajax.entity.Student;
+import net.sf.json.JSONObject;
+
+public class JsonServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		
+		PrintWriter out = response.getWriter(); // 以输出流的方式发送验证消息
+		
+		String name = request.getParameter("name");
+		String age = request.getParameter("age");
+		System.out.println("前端传递来的值：" + name + "::" + age);
+		
+		Student stu1 = new Student();
+		stu1.setName("Jack");
+		stu1.setAge(23);
+		
+		Student stu2 = new Student();
+		stu2.setName("Cai");
+		stu2.setAge(22);
+		
+		Student stu3 = new Student();
+		stu3.setName("Lily");
+		stu3.setAge(19);
+		
+		JSONObject json = new JSONObject();
+		json.put("stu1", stu1);
+		json.put("stu2", stu2);
+		json.put("stu3", stu3);
+		
+		out.print(json); // 返回JSON对象给客户端
+		
+		out.close();
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+}
 ```
 
 
