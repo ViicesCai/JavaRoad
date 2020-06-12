@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>World</artifactId>
+  
+  <!-- 继承父工程 -->
+  <parent>
+  	<!-- 加入父工程坐标：gav -->
+  	<groupId>edu.fdzc.maven</groupId> <!-- 如果与子工程相同：子工程可以不写：groupId -->
+  	<artifactId>FatherMaven</artifactId> 
+  	<version>0.0.1-SNAPSHOT</version> <!-- 如果与子工程相同：子工程可以不写：version -->
+  	
+  	<!-- 子工程：pom.xml 到 父工程：pom.xml 之间的相对路径  -->
+  	<relativePath>../FatherMaven/pom.xml</relativePath>
+  </parent>
+  
+  <dependencies>
+  
+  	<dependency>
+  	<!-- 声明：需要使用到父类的 junit -->
+  	<groupId>junit</groupId>
+  	<artifactId>junit</artifactId>
+  	</dependency>
+  	
+  </dependencies>
+</project>
