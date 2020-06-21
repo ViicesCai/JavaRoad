@@ -64,7 +64,7 @@ public void testConnection1() throws SQLException, ClassNotFoundException {
 	Class.forName(DRIVER);
     // 连接数据库
 	Connection conn = DriverManager.getConnection(URL, USER, PW);
-    // 执行 SQL 语句
+    // 查看连接
 	System.out.println(conn);
     // 关闭连接
 	conn.close();
