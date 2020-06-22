@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件的路径：唯一标识符 -->
+<mapper namespace="edu.fdzc.entity.personMapper">
+	<!-- 查询 -->
+	<select id="queryPersonById" resultType="edu.fdzc.entity.Person" parameterType="int">
+		Select * From Person Where id = #{id}
+	</select>
+	
+	<!-- 增加 -->
+	<insert id="addPerson" parameterType="edu.fdzc.entity.Person">
+		Insert into person(id, name, age) values(#{id}, #{name}, #{age})
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="updatePersonById" parameterType="edu.fdzc.entity.Person">
+		Update person set name = #{name}, age = #{age} where id = #{id}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="deletePersonById" parameterType="int">
+		Delete from person where id = #{id}
+	</delete>
+	
+	<!-- 查询所有 -->
+	<select id="queryAllPersons" resultType="edu.fdzc.entity.Person">
+		Select * from person
+	</select>
+
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 映射文件的路径：唯一标识符 -->
+<mapper namespace="edu.fdzc.mapper.StudentMapper">
+	<!-- 查询 -->
+	<select id="queryStudentBySno" parameterType="int" resultType="edu.fdzc.entity.Student">
+		Select * from student where sno = #{sno}
+	</select>
+	
+	<!-- 增加学生 -->
+	<insert id="addStudent" parameterType="edu.fdzc.entity.Student">
+		Insert into student(sno, sname, sage) values(#{sNo}, #{sName}, #{sAge})
+	</insert>
+</mapper>

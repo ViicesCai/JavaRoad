@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	约定：namespace 的值即：接口的全类名（接口 <=> Mapper.xml）
+ -->
+<mapper namespace="edu.fdzc.mapper.PersonMapper">
+	<!-- 使用第三方的缓存 -->
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache">
+		<property name="maxElementsInMemory" value="2000"/>
+	</cache>
+
+	<!-- 增删改查通过标签的形式 -->
+    <!-- id:用来标识查询语句，resultType:结果集类型，parameterType:占位符类型 -->
+    <!-- Mybatis 约定：resultType 与 parameterType 在形式上只能有一个：可以通过数组包含多个 -->
+    <!-- 
+		parameterType：为简单类型（8个基本类型 + String）可以使用任意占位符：#{xx}
+					  如果为对象类型，则必须是对象的属性 #{属性名}	
+ 	-->
+ 	
+	<!-- 查询 -->
+	<select id="queryPersonById" resultType="person" parameterType="int">
+		Select * From Person Where id = #{id}
+	</select>
+	
+	<!-- 增加 -->
+	<insert id="addPerson" parameterType="person">
+		Insert into person(id, name, age) values(#{id}, #{name}, #{age})
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="updatePersonById" parameterType="person">
+		Update person set name = #{name}, age = #{age} where id = #{id}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="deletePersonById" parameterType="int">
+		Delete from person where id = #{id}
+	</delete>
+	
+	<!-- 查询所有 -->
+	<select id="queryAllPersons" resultType="person">
+		Select * from person
+	</select>
+
+	<!-- 
+		查询：使用类型转换器
+		1.如果类中的属性 和 表中的字段能够合理识别（如：String <-> varchar）则使用 resultType
+		否则使用 resultMap
+		2.如果类中的属性名 与 表中字段名 一一对应（id <-> ID）使用 resultType
+		否则使用resultMap
+	 -->
+	<select id="queryPersonByIdWithConverter" parameterType="int" resultMap="personResult">
+		Select * from person where id = #{id}
+	</select>
+	
+	
+	<!-- 增加：使用类型转换器 -->
+	<insert id="addPersonWithConverter" parameterType="person">
+		Insert into person(id, name, age, sex) values(#{id}, #{name}, #{age}, #{sex, javaType=boolean, jdbcType=INTEGER})
+	</insert>
+	
+	<!-- 查询所有，并根据字段名排序 -->
+	<select id="queryAllPersonsOrderByColumn" parameterType="string"  resultType="person">
+		Select * from person order by ${value} desc
+	</select>
+	
+	<!-- 根据年龄或姓名模糊查询 -->
+	<select id="queryPersonsByAgeOrName" parameterType="person" resultType="person">
+		Select * from person where age = #{age} or name like '%${name}%'
+	</select>
+	
+	<!-- 根据地址查询 -->
+	<!--
+	<select id="queryPersonsByAddress" parameterType="address" resultType="person">
+		Select * from person where homeaddress = #{homeAddress} or workaddress = #{workAddress}
+	</select>
+	-->
+	
+	<!-- 输入参数为级联属性：属性的属性 -->
+	<select id="queryPersonsByAddress" parameterType="person" resultType="person">
+		Select * from person where homeaddress = #{address.homeAddress} or workaddress = #{address.workAddress}
+	</select>
+	
+	<!--  输入参数的类型为 HashMap -->
+	<select id="queryPersonByAgeOrNameWithHashMap" parameterType="HashMap" resultType="person">
+		Select * from person where age = #{age} or name like '%${name}%'
+	</select>
+	
+	<!-- 查询人物总数 -->
+	<select id="queryPersonCount" resultType="int">
+		Select count(*) from person
+	</select>
+	
+	<!-- 输出参数为 HashMap -->
+	<select id="queryPersonByIdOutByHashMap" parameterType="int" resultType="HashMap">
+		<!-- 通过别名作为 Map 的 Key -->
+		Select id "id", name "name" from person where id = #{id}
+	</select>
+	
+	<!-- 输出参数为 HashMap -->
+	<select id="queryAllPersonsOutByHashMap" parameterType="int" resultType="HashMap">
+		<!-- 通过别名作为 Map 的 Key -->
+		Select id "id", name "name" from person
+	</select>
+	
+	<resultMap type="person" id="personResult">
+		<!-- 主键 -->
+		<!-- <id/> -->
+		<!-- 非主键 -->
+		<!-- 属性与字段绑定 -->
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="age" column="age" />
+		<result property="sex" column="sex" javaType="boolean" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<!-- SQL标签  -->
+	<!-- 
+	<select id="queryPersonByIdOrAgeWishSQLTag" parameterType="person" resultType="person">
+		1=1:多用于 sql 语句的拼凑，即：永恒成立，需考虑以下两个条件可能出现的各种状况
+		Select id, name, age from person where 1=1
+		
+		如果 person 有  name 属性且不为 null
+	 	<if test="name != null and name != ''">
+	 		and name = #{name}
+		</if>
+		
+		如果 person 有  age 属性且不为 null
+		<if test="age != null and age != ''">
+			and age = #{age}
+		</if>
+	</select>
+	-->
+	
+	<!-- 优化 -->
+	<select id="queryPersonByIdOrAgeWishSQLTag" parameterType="person" resultType="person">
+		Select id, name, age from person
+		<where>
+			<!-- 如果 person 有  name 属性且不为 null :where 标签会自动加上 and-->
+	 		<if test="name != null and name != ''">
+	 			name = #{name}
+			</if>
+		
+			<!-- 如果 person 有  age 属性且不为 null -->
+			<if test="age != null and age != ''">
+				and age = #{age}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询社区中包含的人 -->
+ 	<select id="queryPersonsWithIdInCommunity" parameterType="community" resultType="person">
+ 		Select * from person
+ 		
+ 		<where>
+ 			<!-- 判断 community 是否有值在进行遍历 -->
+ 			<if test="ids != null and ids.size > 0">
+ 				<!-- 这里主要是对 sql 语句进行一个拼接 -->
+ 				<!-- open+close = and id in("item的遍历值 + separator") -->
+ 				<foreach collection="ids" open=" and id in (" close=")" item="id" separator=",">
+ 					#{id}
+ 				</foreach>
+ 			</if>
+ 		</where>
+	</select>
+	
+	<!-- 将多个元素放入数组 -->
+	<select id="queryPersonsWithArray" parameterType="int[]" resultType="person">
+		Select * from person
+ 		
+ 		<where>
+ 			<!-- 约定：无论该数组的名是什么，在 mapper.xml 必须使用 array 代替该数组 -->
+ 			<!-- 集合同理 -->
+ 			<if test="array != null and array.length > 0">
+ 			
+ 				<!-- 这里主要是对 sql 语句进行一个拼接 -->
+ 				<foreach collection="array" open=" and id in (" close=")" item="id" separator=",">
+ 					#{id}
+ 				</foreach>
+ 			</if>
+ 		</where>
+	</select>
+	
+	<!-- 将多个元素放入集合 -->
+	<select id="queryPersonsWithList" parameterType="list" resultType="person">
+		Select * from person
+ 		
+ 		<where>
+ 			<!-- 约定：无论该数组的名是什么，在 mapper.xml 必须使用 array 代替该数组 -->
+ 			<!-- 集合同理 -->
+ 			<if test="list != null and list.size > 0">
+ 			
+ 				<!-- 这里主要是对 sql 语句进行一个拼接 -->
+ 				<foreach collection="list" open=" and id in (" close=")" item="id" separator=",">
+ 					#{id}
+ 				</foreach>
+ 			</if>
+ 		</where>
+	</select>
+	
+	<!-- 将多个元素放入对象数组 -->
+	<!-- 此处的输入对象有别于普通数组 -->
+	<select id="queryPersonsWithObjectArray" parameterType="Object[]" resultType="person">
+		Select * from person
+ 		
+ 		<where>
+ 			<if test="array != null and array.length > 0">
+ 				
+ 				<foreach collection="array" open=" and id in (" close=")" item="person" separator=",">
+ 					#{person.id}
+ 				</foreach>
+ 			</if>
+ 		</where>
+	</select>
+	
+	<!-- 一对一关联 -->
+	<!-- 用 resultType 指定类的属性，该类包含 多表查询的所有字段 -->
+	<select id="queryPersonByIdWithOneToOne" parameterType="int" resultType="PersonBusiness">
+		Select p.*, c.* from person p inner join personcard c 
+		on p.cardid = c.cardid
+		where p.id = #{id}
+	</select>
+	 
+	<!-- 一对一关联：懒加载 -->
+	<select id="queryPersonByIdWithLazyLoad" parameterType="int" resultMap="person_card_lazyLoad_map">
+		Select * from person where id = #{id}
+	</select> 
+	 
+	<resultMap type="person" id="person_card_lazyLoad_map">
+	 	<id property="id" column="id" />
+	 	<result property="name" column="name"/>
+	 	<result property="age" column="age"/>
+	 	
+	 	<!-- 查询人物信息时，不立即加载身份证信息 -->
+	 	<!-- 通过 select 在需要的时候 查询身份证信息 -->
+	 	<association property="card" javaType="PersonCard" select="edu.fdzc.mapper.PersonCardMapper.queryCardById" column="cardid">
+	 		<!-- 
+	 		<id property="cardId" column="cardId"/>
+	 		<result property="cardInfo" column="cardInfo"/>
+	 		 -->
+	 	</association>
+	 </resultMap>
+	 
+	 <!-- 一对多关联 -->
+	 <select id="queryCommunityAndPersons" parameterType="int" resultMap="community_person_map">
+	 	<!-- 查询某个社区的信息与包含的所有的人 -->
+	 	Select c.*, p.* from person p
+	 	inner join community c
+	 	on c.communityid = p.communityid
+	 	where c.communityid = #{communityid}
+	 </select>
+	 
+	 <resultMap type="communitys" id="community_person_map">
+	 	<!-- 配置 type 的 属性 -->
+	 	<id property="communityId" column="communityId" />
+	 	<result property="communityName" column="communityName" />
+	 
+	 	<!-- 配置成员属性：一对多：使用 collection 集合 -->
+	 	<!-- 属性类型：javaType, 属性的元素类型(为一个集合中的某个元素)：ofType -->
+	 	<collection property="persons" ofType="person">
+	 		<id property="id" column="id"/>
+	 		<result property="name" column="name"/>
+	 		<result property ="age" column="age"/>
+	 	</collection>
+	 </resultMap>
+	 
+	 <!-- 根据 communityid 查询社区中的所有人 -->
+	 <select id="queryPersonByCommunityId" parameterType="int" resultType="person">
+	 	Select * from person where communityId = #{communityId}
+	 </select>
+</mapper>

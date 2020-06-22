@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	约定：namespace 的值即：接口的全类名（接口 <=> Mapper.xml）
+ -->
+<mapper namespace="edu.fdzc.mapper.PersonCardMapper">
+	<!--  查询人物对应的身份证信息 -->
+	<select id="queryCardById" parameterType="int" resultType="personCard">
+		Select * from personCard where cardId = #{cardId}
+	</select>
+</mapper>

@@ -463,8 +463,8 @@ public void addStudent(Student student) {
       + log()：自动执行的通知，即：aop前置通知
   
 > 前置通知
-  
-  
+
+
     ``` java
   package edu.fdzc.aop;
     
@@ -476,11 +476,11 @@ public void addStudent(Student student) {
     }
 }
     ```
-  
+
     ```xml
   <!-- 前置通知类 -->
   <bean id="logBefore" class="edu.fdzc.aop.LogBefore">
-  
+
   <!-- 将方法和通知进行关联 -->
   <aop:config>
       <!-- 配置切入点 -->
@@ -490,9 +490,9 @@ public void addStudent(Student student) {
   	<aop:advisor advice-ref="logBefore" pointcut-ref="poioncut"/>
   </aop:config>
     ```
-  
+
     > execution 表达式
-  
+      
     > execution(public void edu.fdzc.service.impl.StudentServiceImpl.addStudent(edu.fdzc.entity.Student))
     >
   > void：返回值类型
@@ -500,19 +500,19 @@ public void addStudent(Student student) {
   > edu.fdzc.service.impl.StudentServiceImpl.addStudent：执行方法：StudentServiceImpl 类中的 addStudent()
     >
   > edu.fdzc.entity.Student：参数类型
-  
+
   > public * ......：代表任意返回类型
-  
+
   > public void *(......)：代表任意方法名
-  
+
   > public void addStudent(..)：任意参数列表
-  
+
     > \* edu.fdzc.service.impl.StudentServiceImpl.\*.\*(..)：该包中包含的所有方法（不包含子包中的方法）
-  
+      
     > \* edu.fdzc.service.impl.StudentServiceImpl..\*.\*(..)：该包中包含的所有方法（包含子包中的方法）
-  
+
   > 后置通知
-  
+
   ``` java
   package edu.fdzc.aop;
   
@@ -524,7 +524,7 @@ public void addStudent(Student student) {
   	}
   }
   ```
-  
+
   ``` xml
   <!-- 后置通知类 -->
   <bean id="logAfter" class="edu.fdzc.aop.LogAfter">
@@ -538,9 +538,9 @@ public void addStudent(Student student) {
   	<aop:advisor advice-ref="logAfter" pointcut-ref="poioncut"/>
   </aop:config>
   ```
-  
+
   > 异常通知
-  
+
   ``` java
   package edu.fdzc.aop;
   
@@ -551,7 +551,7 @@ public void addStudent(Student student) {
   	}
   }
   ```
-  
+
   ``` xml
   <!-- 异常通知类 -->
   <bean id="logException" class="edu.fdzc.aop.LogException">
@@ -565,13 +565,13 @@ public void addStudent(Student student) {
   	<aop:advisor advice-ref="logException" pointcut-ref="poioncut"/>
   </aop:config>
   ```
-  
+
   > 环绕通知：在目标方法前后、异常发生时、最终等各个地方都可进行通知，是最强大的一个通知，可以获取目标方法的全部控制权（目标方法是否执行、执行之前、执行之后、参数、返回值）
   >
   > 它的优先级最高，其他通知都在它之后
   >
   > 实现底层：拦截器
-  
+
   ``` java
   package edu.fdzc.aop;
   
@@ -597,7 +597,7 @@ public void addStudent(Student student) {
   		return null;
   }
   ```
-  
+
   ``` xml
   <!-- 环绕通知类 -->
   <bean id="logAround" class="edu.fdzc.aop.LogAround"></bean>
@@ -931,3 +931,84 @@ public class LogSchema {
 </beans>
 ```
 
+## 项目整合
+
+> 任何与 Spring 相关的框架，都交由 Spring 进行整合
+
+### Spring - Mybatis
+
+> Mybatis 是通过 SqlSessionFactory 来操作数据库
+>
+> Spring 整合 Mybatis 其实就是将 Mybatis 的 SqlSessionFactory 交给 Spring
+>
+> SqlSessionFactory -> SqlSession -> StudentMapper -> CRUD
+
+#### 需要的 jar 包
+
+> mybatis-spring.jar、spring-tx.jar、spring-jdbc.jar、spring-expression.jar、spring-context-support.jar、spring-core.jar、spring-context.jar、spring-beans.jar、spring-aop.jar、spring-web.jar、commons-logging.jar、commons-jdbc.jar、ojdbc.jar、mybatis.jar、log4.jar、commons-pool.jar
+
+#### 对应类 - 数据表
+
+> 创建一个 entity 包，用于对应数据库中的数据表
+
+#### Mybatis 配置文件：config.xml
+
+> 具体的配置由 Spring 的 applicationContext.xml 完成了，这部分可以省略
+
+#### 映射文件
+
+> mapper.xml：将 entity 类 与 实际的数据表对应起来
+
+#### 主配置文件
+
+> 未整合之前使用 Mybatis:config.xml -> SqlSessionFacotry
+>
+> 整合之后 需要通过 Spring 管理 SqlSessionFacotry
+>
+> 即：产生 SqlSessionFacotry 所需要的数据库信息不再放入 config.xml，而需要放入 Spring 的配置文件中
+
+``` xml
+<!-- applicationContext.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 加载 db.proerties 文件 -->
+	<bean id="config" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<!-- 指定需要加载的文件 -->
+		<property name="locations">
+			<array>
+				<!-- 定位到 db.properties -->
+				<value>classpath:db.properties</value>
+			</array>
+		</property>
+	</bean>
+
+	<!-- 配置数据库信息：代替 mybatis 的配置文件：config.xml -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver}"></property>
+		<property name="url" value="${url}"></property>
+		<property name="username" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="maxActive" value="${maxActive}"></property>
+		<property name="maxIdle" value="${maxIdle}"></property>
+	</bean>
+	
+	<!-- 在 Spring AOC 容器中创建 Mybatis 的核心类：SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 数据库连接的数据源 -->
+		<property name="dataSource" ref="dataSource" /> 
+		<!-- 加载 mybatis 配置文件 -->
+		<property name="configLocation" value="classpath:config.xml" />
+	</bean>
+</beans>
+```
+
+## 使用
+
+> 使用 Spring-Mybatis 整合产物开发程序
+
+> 目标：通过 Spring 产生 Mybatis 最终操作需要的 动态 Mapper对象(如：StudentMapper)
+
+[项目地址]()

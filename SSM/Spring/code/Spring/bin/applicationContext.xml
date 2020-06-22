@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- 配置扫描器 -->
+	<context:component-scan base-package="edu.fdzc.dao.impl, edu.fdzc.service.impl">
+	</context:component-scan>
+
+	<!-- 配置数据库相关信息：支持事务 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/mydatabase"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="abc123"></property>
+		
+		<property name="maxActive" value="10"></property>
+		<property name="maxIdle" value="6"></property>
+	</bean>
+	 
+	<!-- 配置事务管理器：txManager -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 增加对事务的支持 -->
+	<!-- txManager：事务管理器 -->
+	<tx:annotation-driven transaction-manager="txManager"/>
+	
+	<!-- Spring IOC容器 -->
+ 	<bean id="student" class="edu.fdzc.entity.Student">
+ 		<property name="sno" value="211906601"></property>
+ 		<property name="sname" value="CAI"></property>
+ 		<property name="sage" value="22"></property>
+	</bean>
+	
+	<bean id="javaCourse" class="edu.fdzc.instance.JavaCourse">
+	</bean>
+	
+	<bean id="htmlCourse" class="edu.fdzc.instance.HtmlCourse">
+	</bean>
+	
+	<!-- 自动装配 -->
+	<!-- autowire="byName" : ref属性=teacher（属性名） = bean : id=teacher -->
+	<bean id="course" class="edu.fdzc.entity.Course" autowire="byName">
+	
+		<!-- 调用 setXxxx()方法 赋值 -->
+		<property name="cname" value="Java"></property>
+		<property name="chour" value="12"></property>
+		
+		<!-- 将 Teacher 对象注入到 Course 对象中 -->
+		<!--
+		<property name="teacher" ref="teacher"></property>
+		-->
+		
+	</bean>
+	
+	<bean id="teacher" class="edu.fdzc.entity.Teacher" p:tname="Mark" p:tage="43">
+		<!--
+		<property name="tname" value="Jack"></property>
+		<property name="tage" value="43"></property>
+		-->
+
+		<!-- 调用构造器赋值 -->
+		<!--
+		<constructor-arg value="July"></constructor-arg>
+		<constructor-arg value="29"></constructor-arg>
+		-->
+		
+	</bean>
+	
+ 	<bean id="collectionDemo" class="edu.fdzc.entity.AllCollectionType">
+ 		<!-- 通过 set 方式 -->
+ 		<property name="list">
+ 			<list>
+ 				<value>Java</value>
+ 				<value>PHP</value>
+ 				<value>Golang</value>
+ 			</list>
+ 		</property>
+ 		
+ 		<property name="array">
+ 			<array>
+ 				<value>面线糊</value>
+ 				<value>牛肉羹</value>
+ 				<value>烧肉粽</value>
+ 			</array>
+ 		</property>
+ 		
+ 		<property name="set">
+ 			<set>
+ 				<value>衙口</value>
+ 				<value>黄金海岸</value>
+ 				<value>红塔湾</value>
+ 			</set>
+ 		</property>
+ 		
+ 		<property name="map">
+ 			<map>
+ 				<entry>
+ 					<key>
+ 						<value>Name</value>
+ 					</key>
+ 					<value>Cai</value>
+ 				</entry>
+ 				
+ 				<entry>
+ 					<key>
+ 						<value>Age</value>
+ 					</key>
+ 					<value>22</value>
+ 				</entry>
+ 				
+ 				<entry>
+ 					<key>
+ 						<value>Interest</value>
+ 					</key>
+ 					<value>Dance</value>
+ 				</entry>
+ 			</map>
+ 		</property>
+ 		
+ 		<!--
+ 		<property name="props">
+ 			<props>
+ 				<prop key="省份">福建</prop>
+ 				<prop key="城市">福州</prop>
+ 				<prop key="学校">福州大学</prop>
+ 			</props>
+ 		</property>
+ 		
+ 		-->
+ 		
+ 		<!-- 前提：存在该构造方法 -->
+ 		<constructor-arg name="props">
+ 			<props>
+ 				<prop key="省份">福建</prop>
+ 				<prop key="城市">福州</prop>
+ 				<prop key="学校">福州大学</prop>
+ 			</props>
+ 		</constructor-arg>
+	</bean>
+	
+	<!--  
+	<bean id="studentDao" class="edu.fdzc.dao.impl.StudentDaoImp">
+	</bean>
+	
+	<bean id="studentService" class="edu.fdzc.service.StudentServiceImpl">
+		<property name="studentDao" ref="studentDao"></property>
+	</bean>
+	-->
+
+	<!-- 前置通知类 -->
+	<bean id="logBefore" class="edu.fdzc.aop.LogBefore">
+	</bean>
+	
+	<!-- 后置通知类 -->
+	<bean id="logAfter" class="edu.fdzc.aop.LogAfter">
+	</bean>
+	
+	<!-- 异常通知类 -->
+	<bean id="logException" class="edu.fdzc.aop.LogException">
+	</bean>
+	
+	<!-- 环绕通知类 -->
+	<bean id="logAround" class="edu.fdzc.aop.LogAround"></bean>
+	
+	<!-- 将方法和通知进行关联 -->
+	<aop:config>
+		<!-- 配置切入点 -->
+		<aop:pointcut expression="execution(public void edu.fdzc.service.impl.StudentServiceImpl.deleteStudentByNo(int)) or execution(public void edu.fdzc.service.impl.StudentServiceImpl.addStudent(edu.fdzc.entity.Student))" id="poioncut"/>
+		<!-- 链接切入点和切面的线 -->
+		<aop:advisor advice-ref="logBefore" pointcut-ref="poioncut"/>
+	</aop:config>
+	
+	<!-- 将方法和通知进行关联 -->
+	<aop:config>
+		<!-- 配置切入点 -->
+		<aop:pointcut expression="execution(public * edu.fdzc.service.impl.StudentServiceImpl.addStudent(edu.fdzc.entity.Student))" id="poioncut"/>
+		<!-- 连接线的另一端 -->
+		<aop:advisor advice-ref="logAfter" pointcut-ref="poioncut"/>
+	</aop:config>
+	
+	<!-- 将方法和通知进行关联 -->
+	
+	<aop:config>
+		<!-- 配置切入点 -->
+		<aop:pointcut expression="execution(public * edu.fdzc.service.impl.StudentServiceImpl.addStudent(edu.fdzc.entity.Student))" id="poioncut"/>
+		<!-- 连接线的另一端 -->
+		<aop:advisor advice-ref="logException" pointcut-ref="poioncut"/>
+	</aop:config>
+
+	
+	<!-- 将方法和通知进行关联 -->
+	<aop:config>
+		<!-- 配置切入点 -->
+		<aop:pointcut expression="execution(public * edu.fdzc.service.impl.StudentServiceImpl.addStudent(..))" id="poioncut"/>
+		<!-- 连接线的另一端 -->
+		<aop:advisor advice-ref="logAround" pointcut-ref="poioncut"/>
+	</aop:config>
+	
+	<!-- 开启扫描 -->
+	<context:component-scan base-package="edu.fdzc.aop">
+	</context:component-scan>
+	
+	<!-- 开启注解对 AOP 的支持：AOP自动代理 -->
+	<aop:aspectj-autoproxy>
+	</aop:aspectj-autoproxy>
+	
+	<!-- 将 LogSchema 加入 AOP容器 -->
+	<bean id="logSchema" class="edu.fdzc.aop.LogSchema">
+	</bean>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(public * edu.fdzc.service.impl.StudentServiceImpl.addStudent(..))" id="pcSchema"/>
+		
+		<aop:aspect ref="logSchema">
+			<aop:before method="before" pointcut-ref="pcSchema" />
+			<aop:after-returning method="afterReturning" returning="returnValue" pointcut-ref="pcSchema" />
+			<aop:after-throwing method="whenException" pointcut-ref="pcSchema" throwing="e"/>
+			<aop:around method="around" pointcut-ref="pcSchema"/>
+		</aop:aspect>
+	</aop:config>
+</beans>

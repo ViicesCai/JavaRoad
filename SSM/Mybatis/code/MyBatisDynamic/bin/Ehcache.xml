@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+	<!-- 硬盘存储路径：当二级缓存对象超过内存限制时，存入该地址 -->
+	<diskStore path="E:\Ehcache" />
+	
+	<!-- 
+	maxElementsInMemory: 内存中缓存对象的个数：1000
+	maxElementsOnDisk: 硬盘中缓存对象的个数：1000000
+	eternal: 缓存是否永远不过期（失效）
+	overflowToDisk: 当内存中缓存的对象个数超过该值，是否转移到硬盘中
+	timeToIdleSeconds: 当两次访问时间 超过该值时，缓存对象失效
+	timeToLiveSeconds: 缓存对象最长存放的时间（生命周期）
+	diskExpiryThreadIntervalSeconds: 设置每隔多长时间通过一个线程来清理硬盘中的缓存
+	memoryStoreEvictionPolicy: 当超过缓存对象的最大值时，处理的策略
+	LRU: 最近最少使用的对象
+	-->
+	<defaultCache maxElementsInMemory="1000" 
+		maxElementsOnDisk="1000000" eternal="false" overflowToDisk="false"
+		timeToIdleSeconds="100" timeToLiveSeconds="100"
+		diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
+	</defaultCache>
+</ehcache>  

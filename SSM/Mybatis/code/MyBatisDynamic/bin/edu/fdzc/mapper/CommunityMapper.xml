@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+	约定：namespace 的值即：接口的全类名（接口 <=> Mapper.xml）
+ -->
+<mapper namespace="edu.fdzc.mapper.CommunityMapper">
+	<!-- 一对多关联：懒加载 -->
+	 <select id="queryCommunityAndPersonsWithLazyLoad" resultMap="community_person_map">
+	 	<!-- 查询社区 -->
+	 	Select c.* from community c
+	 </select>
+	 
+	 <resultMap type="communitys" id="community_person_map">
+	 	<!-- 配置 type 的 属性 -->
+	 	<id property="communityId" column="communityId" />
+	 	<result property="communityName" column="communityName" />
+	 
+	 	<!-- 延迟加载 -->
+	 	<collection property="persons" ofType="person" select="edu.fdzc.mapper.PersonMapper.queryPersonByCommunityId" column="communityid">
+	 		<id property="id" column="id"/>
+	 		<result property="name" column="name"/>
+	 		<result property ="age" column="age"/>
+	 	</collection>
+	 </resultMap>
+</mapper>

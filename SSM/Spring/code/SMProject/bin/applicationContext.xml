@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 加载 db.proerties 文件 -->
+	<bean id="config" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<!-- 指定需要加载的文件 -->
+		<property name="locations">
+			<array>
+				<!-- 定位到 db.properties -->
+				<value>classpath:db.properties</value>
+			</array>
+		</property>
+	</bean>
+	
+	<!-- 第一种方式生成 mapper 对象 -->
+	<!-- 
+	<bean id="studentMapper" class="edu.fdzc.dao.impl.StudentDaoImpl">
+		将 Spring 配置的 sqlSessionFactory 对象交给 mapper(Dao)
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	 -->
+	
+	<!-- 第二种方式生成 mapper 对象：通过 mybatis 提供的 mapper 实现类 -->
+	<!-- 缺点：每个 mapper 都需要配置实现类 -->
+	<!--  
+	<bean id="studentMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="edu.fdzc.mapper.StudentMapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	-->
+	
+	<!-- 
+		第三种方式生成 mapper 对象：批量配置 
+		批量产生 Mapper 在 SpringIOC 中的 id 值默认就是 接口名：首字母必须小写
+	 -->
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" ref="sqlSessionFactory"></property>
+		<!-- 指定批量产生包的对象 -->
+		<property name="basePackage" value="edu.fdzc.mapper" ></property>
+	</bean>
+	
+	<bean id="studentService" class="edu.fdzc.service.impl.StudentServiceImpl">
+		<property name="studentMapper" value="studentMapper"></property>
+	</bean>
+
+	<!-- 配置数据库信息：代替 mybatis 的配置文件：config.xml -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver}"></property>
+		<property name="url" value="${url}"></property>
+		<property name="username" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="maxActive" value="${maxActive}"></property>
+		<property name="maxIdle" value="${maxIdle}"></property>
+	</bean>
+	
+	<!-- 在 Spring AOC 容器中创建 Mybatis 的核心类：SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 数据库连接的数据源 -->
+		<property name="dataSource" ref="dataSource" /> 
+		<!-- 加载 mybatis 配置文件 -->
+		<!--  
+		<property name="configLocation" value="classpath:config.xml" />
+		-->
+		<!-- 加载该包中的所有 mapper.xml -->
+		<property name="mapperLocations" value="edu/fdzc/mapper/*.xml"></property>
+	</bean>
+</beans>

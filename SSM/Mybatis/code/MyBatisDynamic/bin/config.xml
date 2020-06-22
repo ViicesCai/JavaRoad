@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<!-- 引入 数据库配置 -->
+	<properties resource="db.properties" />
+	
+	<settings>
+		<!-- 开启日志，并指定使用的具体日志 -->
+		<!--
+			如果未指定日志 则 Mybatis 自动根据以下顺序寻找日志
+			SLF4J -> Apache Commons Logging -> Log4j 2 -> Log4j -> JDK logging 
+		 -->
+		<setting name="logImpl" value="LOG4J"/>
+		
+		<!-- 开启延迟加载 -->
+		<setting name="lazyLoadingEnabled" value="true"/>
+		
+		<!-- 关闭立即加载 -->
+		<setting name="aggressiveLazyLoading" value="false"/>
+		
+		<!-- 开启二级缓存 -->
+		<setting name="cacheEnabled" value="true"/>
+	</settings>
+	
+	<!-- 定义别名 -->
+	<typeAliases>
+		<!-- 定义单个别名:别名 忽略大小写 -->
+		<!-- <typeAlias type="edu.fdzc.entity.Person" alias="person"/> -->
+		
+		<!-- 批量定义:会将该包下的所有类定义别名：别名 = 类名（不带包名）：忽略大小写 -->
+		<package name="edu.fdzc.entity"/>
+	</typeAliases>
+	
+	<!-- 配置转换器 -->
+	<typeHandlers>
+		<typeHandler handler="edu.fdzc.converter.BooleanAndIntConverter" javaType="Boolean" jdbcType="INTEGER"/>
+	</typeHandlers>
+
+    <!-- 通过 environments 的 default 和 environment 的 id 来指导 Mybatis 运行时的数据库环境 -->
+	<environments default="development">
+	 	<!-- 开发环境 -->
+		<environment id="development">
+			<!-- 
+				配置事务的提交方式：JDBC(手工方式)
+ 				MANAGED：将事务交由其他组件托管（Spring、Jobss）：默认会关闭连接
+			-->
+            <!-- <property name="closeConnection" value="false" />：默认不关闭 -->
+			<transactionManager type="JDBC" />
+			<!-- 数据源类型：
+					POOLED：数据库连接池：省略了数据库打开和关闭：提高效率
+ 					UNPOOLED：传统的JDBC模式：每次访问数据库都需要打开、关闭：损耗性能
+					JNDI：从 Tomcat 获取内置的数据库连接池（即：数据源）
+			-->
+			<dataSource type="POOLED">
+				<!-- 配置数据库信息 -->
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<!-- 加载映射文件 -->
+		<mapper resource="edu/fdzc/mapper/personMapper.xml" />
+		<mapper resource="edu/fdzc/mapper/personCardMapper.xml" />
+		<mapper resource="edu/fdzc/mapper/communityMapper.xml" />
+	</mappers>
+</configuration>
