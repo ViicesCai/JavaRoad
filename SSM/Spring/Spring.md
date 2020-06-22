@@ -1011,4 +1011,4 @@ public class LogSchema {
 
 > 目标：通过 Spring 产生 Mybatis 最终操作需要的 动态 Mapper对象(如：StudentMapper)
 
-[项目地址]()
+[项目地址](https://github.com/ViicesCai/JavaRoad/tree/master/SSM/Spring/code/SMProject)
