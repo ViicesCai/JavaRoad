@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+	<!-- 扫描包：通常使用了注解定义 必须使用扫描获取 -->
+	<context:component-scan base-package="edu.fdzc.handler"></context:component-scan>
+	
+	<!-- 配置视图解析器(InternalResourceViewResolver) -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 前缀 -->
+		<property name="prefix" value="/views/"></property>
+		<!-- 后缀 -->
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<!-- 加载国际化资源文件 
+	将 ResourceBundleMessageSource 在程序加载时 加入 SpringMVC : SpringMVC 在启动时，会自动查找一个 id = "messageSource" 的 bean,如果存在则自动加载
+	如果配置了 ResourceBundleMessageSource，则该类会在程序响应时介入
+	-->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="i18n"></property>
+	</bean>
+	
+	<!-- view-name:会被视图解析器加上前缀、后缀 -->
+	<mvc:view-controller path="handler/testMvcViewController" view-name="test"/>
+	
+	<!-- 将自定义转换器纳入 SpringIOC 容器 -->
+	<bean id="myConverter" class="edu.fdzc.converter.MyConverter"></bean>
+	
+	<!-- 将 myConverter 纳入 SpringMVC 提供的转换器 bean 中 -->
+	<!--  
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<ref bean="myConverter"/>
+			</set>
+		</property>
+	</bean>
+	-->
+	
+	<!-- 会将所有请求转入 <mvc:...> 中匹配映射地址，而会忽略 @RequestMapping() -->
+	<!-- 此配置是 SpringMVC 的基础配置：使 <mvc...> 和  @RequestMapping() 共存 -->
+	<!-- 将 conversionService 注册到 annotation-driven 中 -->
+	<!-- 此配置是 SpringMVC 的基础配置，很多功能需要此配置进行协调 -->
+	<mvc:annotation-driven  conversion-service="conversionService"/>
+		
+	<!-- 
+	配置数据格式化注解所依赖的 bean 
+	FormattingConversionServiceFactoryBean：既可以实现数据格式化、又可以实现类型转换
+	-->
+	<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<ref bean="myConverter"/>
+			</set>
+		</property>
+	</bean>
+	
+	<!-- 加载静态资源 -->
+	<mvc:default-servlet-handler/>
+	
+	<!-- 配置CommonsMultipartResolver：用于实现文件上传，将其加入 SpringIOC 容器 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 上传文件的默认编码 -->
+		<property name="defaultEncoding" value="UTF-8" />
+		<!-- 上传单个文件的最大容量，单位 byte：-1 表示无限制 -->
+		<property name="maxUploadSize" value="102400" />
+	</bean>
+	
+	<!-- 将拦截器配置到 SpringMVC 中：默认拦截全部 -->
+	<mvc:interceptors>		
+		<!-- 配置具体的拦截路径 -->
+		<mvc:interceptor>
+			<!-- 指定拦截的路径，基于 ant 风格 -->
+			<mvc:mapping path="/**"/>
+			<!-- 指定不拦截的路径 -->
+			<mvc:exclude-mapping path="/handler/testUpload"/>
+			<bean class="edu.fdzc.interceptor.MyInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+	
+	<!-- SimpleMappingExceptionResolver:以配置方式，处理异常 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<!-- 将该异常保存到 requestScope中，通过 error 获取 -->
+		<!-- 未配置该属性：默认为 exception -->
+		<property name="exceptionAttribute" value="error"/>
+		<property name="exceptionMappings">
+			<props>
+				<!-- 等同于：catch(ArithmeticException e) -->
+				<prop key="java.lang.ArithmeticException">
+					error <!-- 捕获异常后：跳转到 error 页面 -->
+				</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

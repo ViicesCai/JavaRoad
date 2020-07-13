@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+	
+	<!-- 依赖注入：给 Service 注入 Dao -->
+	<bean id="studentService" class="edu.fdzc.service.impl.StudentServiceImpl">
+		<property name="studentMapper" ref="studentMapper"></property>
+	</bean>
+	
+	<!-- 配置数据源、mapper.xml -->
+	
+	<!-- 加载 db.proerties 文件 -->
+	<bean id="config" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<!-- 指定需要加载的文件 -->
+		<property name="locations">
+			<array>
+				<!-- 定位到 db.properties -->
+				<value>classpath:db.properties</value>
+			</array>
+		</property>
+	</bean>
+	
+	<!-- 配置数据库信息 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver}"></property>
+		<property name="url" value="${url}"></property>
+		<property name="username" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="maxActive" value="${maxActive}"></property>
+		<property name="maxIdle" value="${maxIdle}"></property>
+	</bean>
+	
+	<!-- 在 Spring AOC 容器中创建 Mybatis 的核心类：SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 数据库连接的数据源 -->
+		<property name="dataSource" ref="dataSource" /> 
+		
+		<!-- 加载 mybatis 配置文件 -->
+		<!-- 加载该包中的所有 mapper.xml -->
+		<property name="mapperLocations" value="classpath:edu/fdzc/mapper/*.xml"></property>
+	</bean>
+	
+	<!-- Spring 整合 MyBatis：将 SqlSessionFactory 交给 Spring -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+		
+		<!-- 指定批量产生包的对象 -->
+		<property name="basePackage" value="edu.fdzc.mapper" ></property>
+		<!-- 即：将  edu.fdzc.mapper 包中，所有的接口产生与之对应的动态代理对象（对象名就是首字母小写的接口名）-->
+	</bean>
+</beans>
