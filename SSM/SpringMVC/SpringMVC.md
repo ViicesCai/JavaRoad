@@ -1,4 +1,4 @@
-# SpringMVC
+# 	SpringMVC
 
 > spring-webmvc.jar
 >
@@ -545,7 +545,7 @@ public String testModelAttribute(@ModelAttribute("stu") Student student) {
 
 ## 视图类型
 
-![image-20200629085115574](E:\我的坚果云\images\image-20200629085115574.png)
+![image-20200629085115574](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200629085115574.png)
 
 > 视图顶级接口：View
 >
@@ -905,4 +905,483 @@ public String testDateTimeFormat(Student student, BindingResult result, Map<Stri
 > 如果要将控制台的错误消息传到 jsp 中显示，则可以将错误消息放入 request 域中，然后在 jsp 中从 request 域中获取
 
 ### 数据校验
+
+#### JSR 303
+
+| 注解                        |                          详细信息                          |
+| --------------------------- | :--------------------------------------------------------: |
+| @Null                       |                  被注释的元素必须为 null                   |
+| @NotNull                    |                 被注释的元素必须不为 null                  |
+| @AssertTrue                 |                  被注释的元素必须为 true                   |
+| @AssertFalse                |                  被注释的元素必须为 false                  |
+| @Min(value)                 | 被注释的元素必须是一个数字，其值必须大于或等于指定的最小值 |
+| @Max(value)                 | 被注释的元素必须是一个数字，其值必须小于或等于指定的最大值 |
+| @DecimalMin(value)          | 被注释的元素必须是一个数字，其值必须大于或等于指定的最小值 |
+| @DecimalMax(value)          | 被注释的元素必须是一个数字，其值必须小于或等于指定的最大值 |
+| @Size(max, min)             |            被注释的元素的大小必须在指定的范围内            |
+| @Digits (integer, fraction) |    被注释的元素必须是一个数字，其值必须在可接受的范围内    |
+| @Past                       |              被注释的元素必须是一个过去的日期              |
+| @Future                     |              被注释的元素必须是一个将来的日期              |
+| @Pattern(value)             |            被注释的元素必须符合指定的正则表达式            |
+
+#### Hibernate Validator
+
+> JSR 303 的拓展
+
+| 注解      |                详细信息                |
+| --------- | :------------------------------------: |
+| @Email    |     被注释的元素必须是电子邮箱地址     |
+| @Length   | 被注释的字符串的大小必须在指定的范围内 |
+| @NotEmpty |        被注释的字符串的必须非空        |
+| @Range    |     被注释的元素必须在合适的范围内     |
+
+#### 配置
+
+> hibernate-validator.jar
+>
+> classmate.jar
+>
+> jboss-logging.jar
+>
+> validatetion-api.jar
+>
+> hibernate-validator-annotation-processor.jar
+
+> 实现数据校验必须实现 ValidatorFactory 接口
+>
+> LocalValidatorFactoryBean 是 ValidatorFactory 的一个实现类
+
++ \<mvc:annotation-driven\>\</mvc:annotation-driven\> 会在 SpringMVC 容器中自动加载该实现类
+
+#### 使用
+
+``` java
+// 在类中使用注解
+public class Student {
+    @Past // 当前时间以前
+    private Date birthday;
+    ...
+}
+```
+
+``` java
+// 控制器中添加 @Valid
+// 格式化日期
+@RequestMapping(value = "testDateTimeFormat")
+public String testDateTimeFormat(@Valid Student student, BindingResult result, Map<String, Object> map) { // 如果 Student 格式化出错，会将错误信息传入 result 中
+	System.out.println(student.toString() + "," + student.getBirthday());
+		
+	if (result.getErrorCount() > 0) { // 打印错误信息
+		for (FieldError error : result.getFieldErrors()) {
+			System.out.println(error.getDefaultMessage());
+			map.put("errors", result.getFieldErrors()); // 将错误信息传入 request 域中的 errors
+		}
+	}
+		
+	return "test"; 
+}
+```
+
+## AJAX 请求 SpringMVC
+
+> jackson-annotations.jar
+>
+> jackson-core.jar
+>
+> jackson-databind.jar
+
++ @ResponseBody 修饰的方法：将该方法的返回值以一个 json 数组的形式返回给前台
+
+``` java
+@ResponseBody // 告诉 SpringMVC 此时返回的不是一个 view 页面 而是一个 ajax 调用的返回值
+@RequestMapping(value = "testJson")
+public List<Student> testJson() {
+	// List<Student> students = studentService.queryAllStudent();
+		
+	// 模拟 service 查询操作
+	Student stu1 = new Student(1, "Cai");
+	Student stu2 = new Student(2, "Jack");
+	Student stu3 = new Student(3, "Kay");
+		
+	List<Student> students = new ArrayList<Student>();
+	students.add(stu1);
+	students.add(stu2);
+	students.add(stu3);
+		
+	return students;
+}
+```
+
+``` jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    // 服务端将返回值结果以 json 数组的形式传给 result
+	$(document).ready(function(){
+		$("#testJson").click(function(){
+			// 通过 Ajax 请求 SpringMVC
+			$.post(
+				"handler/testJson", // 服务器地址
+				// {"name" : "cai"}, // 传递参数
+
+				function(result){ // 服务端处理之后的回调函数：返回 List<Student>
+					for(var i = 0; i < result.length; i++){
+						alert(result[i].id +  " - " + result[i].name);
+					}
+				}
+			);
+		});
+	});
+</script>
+</head>
+<body>
+	<input type="button" value="testJson" id="testJson" /> <br/>
+</body>
+</html>
+```
+
+## 文件上传
+
+> commons-fileupload.jar
+>
+> commons-io.jar
+
++ 必须实现 MultipartResolver 接口，SpringMVC 提供实现类：CommonsMultipartResolver 类 实现上传
+
+``` xml
+<!-- 配置CommonsMultipartResolver：用于实现文件上传，将其加入 SpringIOC 容器 -->
+<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	<!-- 上传文件的默认编码 -->
+	<property name="defaultEncoding" value="UTF-8" />
+	<!-- 上传单个文件的最大容量，单位 byte：-1 表示无限制 -->
+	<property name="maxUploadSize" value="102400" />	
+</bean>
+```
+
+``` jsp
+<form action="handler/testUpload" method="post" enctype="multipart/form-data">
+	<input type="file" name="file" /> <br>
+	描述：<input name="desc" type="text" /> <br>
+	<input type="submit" value="上传" />
+</form>
+```
+
+``` java
+// 文件上传
+@RequestMapping(value = "testUpload")
+public String testUpload(@RequestParam("desc") String desc, @RequestParam("file") MultipartFile file) throws IOException {
+	System.out.println("文件描述信息：" + desc);
+		
+	String fileName = file.getOriginalFilename(); // 获取上传时的文件名
+		
+	// jsp 中上传的文件
+	InputStream is = file.getInputStream();
+	OutputStream os = new FileOutputStream("d:\\" + fileName);
+		
+	byte[] temp = new byte[1024];
+	int len = -1;
+		
+	while ((len = is.read(temp)) != -1) {
+		os.write(temp, 0, len);
+	}
+		
+	os.close();
+	is.close();
+		
+	System.out.println("上传成功！");
+		
+	return "success";
+}
+```
+
+> 使用框架实现文件上传大大缩减了代码量，但是必须得清楚具体的实现配置
+
+## 拦截器
+
+> 等同于过滤器
+>
+> 必须实现：HandlerInterceptor 接口
+
+![image-20200713105040549](https://typora-image-1301733210.cos.ap-guangzhou.myqcloud.com/img/image-20200713105040549.png)
+
+``` java
+/**
+ * 拦截器
+ * 
+ * @author CAI
+ *
+ */
+public class MyInterceptor implements HandlerInterceptor {
+
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		System.out.println("拦截请求");
+		
+		return true; // true：拦截操作之后放行；false：拦截之后不放行，请求终止
+	}
+
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		
+		System.out.println("拦截响应");
+	}
+
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+			throws Exception {
+		
+		System.out.println("视图渲染完毕");
+	}
+}
+```
+
+``` xml
+<!-- 将拦截器配置到 SpringMVC 中：默认拦截全部 -->
+<mvc:interceptors>		
+    <!-- 配置具体的拦截路径 -->
+	<mvc:interceptor>
+		<!-- 指定拦截的路径，基于 ant 风格 -->
+		<mvc:mapping path="/**"/>
+			<!-- 指定不拦截的路径 -->
+			<mvc:exclude-mapping path="/handler/testUpload"/>
+			<bean class="edu.fdzc.interceptor.MyInterceptor" />
+		</mvc:interceptor>
+</mvc:interceptors>
+```
+
+> 若配置多个拦截器，则：
+>
+> 拦截器1拦截请求 -> 拦截器2拦截请求 -> 请求方法 -> 拦截器2处理响应 -> 拦截器1处理响应 -> 只会被最后一个拦截器渲染（即：拦截器2）
+
+## 异常处理
+
+> 要实现异常处理必须实现 HandlerExceptionResolver 接口
+>
+> 该接口的每个实现类，都是异常的一种处理方式
+
+### ExceptionHandlerExceptionResolver 类
+
+> 该类提供 @ExceptionHandler 注解：通过该注解处理异常
+
+``` java
+// 该方法可以捕获本类中，抛出的 ArithmeticException(数学)或ArrayIndexOutOfBoundsException(数组越界) 异常
+@ExceptionHandler({ArithmeticException.class, ArrayIndexOutOfBoundsException.class})
+public String handlerArithmeticException(Exception e, Model model) {
+	System.out.println(e);
+	model.addAttribute("error", e);
+		
+	return "error";
+}
+```
+
+> @ExceptionHandler 标识的方法参数必须在异常类型（Throwable或其子类），不能包含其他类型的参数
+
+> 异常处理路径：最短优先：即 Exception 优先级最高
+
+> 若发生异常的方法和处理异常的方法不再同一类中：则需要使用 @ControllerAdvice
+
+``` java
+/**
+ * 异常处理类
+ * 
+ * @author CAI
+ *
+ */
+@ControllerAdvice
+public class MyExceptionHandler {
+
+	// 可以处理任何类中的异常
+	@ExceptionHandler({Exception.class})
+	public String handlerArithmeticException(Exception e, Model model) {
+		System.out.println(e);
+		model.addAttribute("error", e);
+			
+		return "error";
+	}
+}
+```
+
+### ResponseStatusExceptionResolver 类
+
+> 自定义异常显示页面：@ResponseStatus
+
+``` java
+/**
+ * 处理数组越界异常
+ * 
+ * @author CAI
+ *
+ */
+@ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "数组越界异常") // 状态码-状态描述
+public class MyArrayIndexOutOfBoundsException extends Exception { // 自定义异常
+    
+}
+
+```
+
+``` java
+@RequestMapping("testMyException")
+	public String testMyException(@RequestParam("i") Integer i) throws MyArrayIndexOutOfBoundsException {
+		
+		if (i == 3) {
+			throw new MyArrayIndexOutOfBoundsException(); // 抛出异常
+		}
+		
+		return "success";
+	}
+```
+
+> 方式2
+
+``` java
+@RequestMapping("testMyException2")
+public String testMyException2(@RequestParam("i") Integer i) {
+		
+	if (i == 3) {
+		return "redirect:testResponseStatus"; // 重定向不会被视图解析器解析
+	}
+		
+	return "success";
+}
+	
+@ResponseStatus(value = HttpStatus.ACCEPTED, reason = "测试自定义异常")
+@RequestMapping("testResponseStatus")
+public String testResponseStatus() {
+		
+	return "success";
+}
+```
+
+### DefaultHandlerExceptionResolver 类
+
+> 默认的异常处理类
+
+``` java
+@RequestMapping(value = "welcome2", method = RequestMethod.POST)
+public String welcome2() {
+	return "success";
+}
+```
+
+> 此时通过 get 方式访问该控制器则自动报错：405
+
+### SimpleMappingExceptionResolver 类
+
+> 通过配置实现异常的处理
+
+``` java
+@RequestMapping(value = "testSimpleMappingExceptionResolver")
+public String testSimpleMappingExceptionResolver() {
+	System.out.println(1/0);
+		
+	return "success";
+}
+```
+
+``` xml
+<!-- SimpleMappingExceptionResolver:以配置方式，处理异常 -->
+<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	<!-- 将该异常保存到 requestScope中，通过 error 获取 -->
+    <!-- 未配置该属性：默认为 exception -->
+	<property name="exceptionAttribute" value="error"/>
+	<property name="exceptionMappings">
+		<props>
+			<!-- 等同于：catch(ArithmeticException e) -->
+			<prop key="java.lang.ArithmeticException">
+				error <!-- 捕获异常后：跳转到 error 页面 -->
+			</prop>
+		</props>
+	</property>
+</bean>
+```
+
+## SSM 整合
+
+> Spring - SpringMVC - MyBatis
+
+### Spring - MyBatis
+
+> 将 MyBatis 的 SqlSessionFactory 交给 Spring
+
+查看：Spring 的 项目整合
+
+### Spring - SpringMVC
+
+> 将 SpringMVC 加入项目
+
+> spring-webmvc.jar
+
+#### 配置
+
+``` xml
+<!-- web.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>SSMProject</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- web项目中，引入 Spring -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- WEB项目 整合 SpringMVC -->
+	<servlet>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:applicationContext-controller.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<!-- 拦截一切请求 -->
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+</web-app>
+```
+
+``` xml
+<!--SpringMVC配置文件：applicationContext-controller.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+    
+	<!-- 配置视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/views/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- SpringMVC 基础配置 -->
+	<mvc:annotation-driven></mvc:annotation-driven>
+</beans>
+```
+
+### 示例
+
+参照 code 文件夹/SSMProject
 
