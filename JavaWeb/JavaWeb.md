@@ -396,8 +396,6 @@ String getContextPath(); // 虚拟路径
 String getRealPath(String name); // 绝对路径（相对于虚拟路径的绝对路径）
 ```
 
-
-
 ```
 out：
 ：
@@ -650,8 +648,6 @@ C：Controller，控制器
   	}
   }
   ```
-
-  
 
 + `doGet()`接受并处理所有 get 提交方式的请求
 
