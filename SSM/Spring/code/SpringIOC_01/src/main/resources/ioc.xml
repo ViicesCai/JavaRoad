@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       xmlns:p="http://www.springframework.org/schema/p">
+    <!-- 注册一个Person对象，Spring会自动创建这个Person对象 -->
+    <!--
+    一个Bean标签可以注册一个组件（对象、类）
+    class：写要注册组件的全类名
+    id：这对象的唯一标示
+    -->
+    <bean id="person01" class="edu.fdzc.beans.Person">
+        <!--
+        使用Property标签为Person对象的属性赋值
+        name="lastName"：指定属性名
+        value="张三"：为这个属性赋值
+        -->
+        <property name="lastName" value="张三"/>
+        <property name="age" value="20"/>
+        <property name="email" value="zs@fdzc.edu"/>
+        <property name="gender" value="男"/>
+    </bean>
+
+    <!-- 调用有参构造函数进行创建并赋值 -->
+    <bean id="person02" class="edu.fdzc.beans.Person">
+        <constructor-arg name="lastName" value="李四"/>
+        <constructor-arg name="age" value="21"/>
+        <constructor-arg name="email" value="ls@fdzc.edu"/>
+        <constructor-arg name="gender" value="女"/>
+    </bean>
+
+    <!-- name可以省略，但必须按照有参构造函数的参数位置赋值 -->
+    <bean id="person03" class="edu.fdzc.beans.Person">
+        <constructor-arg value="王五"/>
+        <constructor-arg value="23"/>
+        <constructor-arg value="ww@fdzc.edu"/>
+        <constructor-arg value="男"/>
+    </bean>
+
+    <!-- index 指定参数位置 -->
+    <bean id="person04" class="edu.fdzc.beans.Person">
+        <constructor-arg value="王五"/>
+        <constructor-arg value="23"/>
+        <constructor-arg value="ww@fdzc.edu" index="3"/>
+        <constructor-arg value="男" index="2"/>
+    </bean>
+
+    <!-- 构造函数的匹配机制都是自顶向下的 -->
+    <bean id="person05" class="edu.fdzc.beans.Person">
+        <constructor-arg value="赵六"/>
+        <constructor-arg value="zl@fdzc.edu"/>
+        <constructor-arg value="女"/>
+    </bean>
+
+    <!-- 通过P名称空间为Bean赋值 -->
+    <!-- 名称空间：在xml中名称空间是用来防止标签重复的 -->
+    <bean id="person06" class="edu.fdzc.beans.Person"
+          p:age="18"
+          p:email="ll@fdzc.edu"
+          p:lastName="李丽"
+          p:gender="女">
+    </bean>
+</beans>

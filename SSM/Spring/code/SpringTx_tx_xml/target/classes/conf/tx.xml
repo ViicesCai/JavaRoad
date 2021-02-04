@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans.xsd
+               http://www.springframework.org/schema/context
+               http://www.springframework.org/schema/context/spring-context.xsd
+               http://www.springframework.org/schema/tx
+               http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="edu.fdzc"/>
+
+    <!-- 引入外部配置文件 -->
+    <context:property-placeholder location="classpath:conf/dbconfig.properties"/>
+
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="driverClass" value="${jdbc.driverClass}"/>
+    </bean>
+
+    <!-- 配置JdbcTemplate操作数据库 -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <!--
+        基于xml配置的事务
+        1.Spring中提供事务管理器（事务切面），配置这个事务管理器
+        2.配置事务方法
+        3.告诉Spring哪些是事务方法
+    -->
+    <bean id="bookService" class="edu.fdzc.service.BookService"/>
+
+    <aop:config>
+        <aop:pointcut id="txPoint" expression="execution(* edu.fdzc.service.*.*(..))"/>
+        <!-- 事务建议：事务增强 -->
+        <aop:advisor advice-ref="myAdvice" pointcut-ref="txPoint"/>
+    </aop:config>
+
+    <!-- 配置事务管理器 -->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" value="#{dataSource}"/>
+    </bean>
+
+    <tx:advice transaction-manager="dataSourceTransactionManager" id="myAdvice">
+        <!-- 事务属性 -->
+        <tx:attributes>
+            <!-- 指明事务方法 -->
+            <tx:method name="checkout" propagation="REQUIRED" timeout="-1"/>
+            <tx:method name="get*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+</beans>

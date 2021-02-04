@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <!-- 引用外部属性文件：依赖context名称空间 -->
+    <!--
+        数据库连接池作为单实例是最好的；
+        一个项目就一个连接池，连接池里面管理很多连接；
+        连接是直接从连接池中拿的；
+        可以让Spring帮我们创建连接池（管理连接池）
+     -->
+    <!-- 加载外部配置文件：classpath：引用类路径下的一个资源 -->
+    <context:property-placeholder location="classpath:conf/dbconfig.properties"/>
+    <!-- username是Spring的key中的关键字；为了防止配置文件中的key和spring自己的关键字冲突：建议加上前缀 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="driverClass" value="${jdbc.driverClass}"/>
+    </bean>
+
+    <bean id="car01" class="fdzc.beans.Car">
+        <!-- Spring中的username表示主机名 -->
+        <property name="carName" value="${username}"/>
+    </bean>
+
+</beans>

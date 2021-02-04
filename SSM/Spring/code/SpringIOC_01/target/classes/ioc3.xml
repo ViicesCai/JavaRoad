@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 按照配置顺序创建Bean：car -> person -> book -->
+    <!-- Bean之间的依赖 -->
+    <!-- depends-on：改变Bean的创建顺序 -->
+    <bean id="car" class="edu.fdzc.beans.Car" depends-on="book, person"/>
+    <bean id="person" class="edu.fdzc.beans.Person"/>
+    <bean id="book" class="edu.fdzc.beans.Book"/>
+
+    <!--
+        测试Bean的作用域，分别创建单例和多实例的Bean
+        bean的作用域：指定Bean是否为单实例，默认为单例
+        prototype：多实例的
+        容器启动默认不会创建多实例的bean
+        获取bean时，才会被创建
+        每次获取bean都会创建新的实例对象
+
+        singleton：单实例的，默认
+        在容器启动之前就已经创建好对象，保存在容器中
+
+
+        request：在web环境下，同一次请求会创建一个bean实例
+        session：在web环境下，同一次会话会创建一个bean实例
+    -->
+    <!-- <bean id="book" class="edu.fdzc.beans.Book" scope="singleton"/> -->
+
+    <!-- 配置通过静态工厂方法创建bean、实例工厂方法创建的bean、FactoryBean -->
+    <!-- bean的创建默认就是框架利用反射new出来的bean实例 -->
+    <!--
+        工厂模式：工厂帮我们创建对象：有一个专门帮我们创建对象的类，这个类就是工厂
+        静态工厂：工厂本身不用创建对象；通过静态方法调用，工厂类.工厂方法名()
+        实例工厂：工厂本身需要创建对象，需要创建工厂类，通过工厂类对象的方法获得对象
+    -->
+
+    <!--
+        静态工厂（不需要创建工厂实例）
+        class：指定静态工厂全类名
+        factory-method：指定工厂方法
+        constructor-arg：为方法传参
+    -->
+    <bean id="airPlane01" class="edu.fdzc.factory.AirPlaneStaticFactory"
+        factory-method="getAirPlane">
+        <!-- 为方法指定参数 -->
+        <constructor-arg value="CAI"/>
+    </bean>
+
+    <!--
+        实例工厂
+        factory-bean：配置实例工厂对象
+        factory-method：配置使用的工厂方法
+     -->
+    <bean id="airPlaneInstanceFactory" class="edu.fdzc.factory.AirPlaneInstanceFactory"/>
+    <bean id="airPlane02" class="edu.fdzc.beans.AirPlane"
+        factory-bean="airPlaneInstanceFactory"
+        factory-method="getAirPlane">
+        <constructor-arg value="Kay"/>
+    </bean>
+
+    <!--
+        FactoryBean：是Spring规定的一个接口
+        只要是这个接口实现的类，Spring都认为是一个工厂
+        IOC容器中启动时，不会自动创建
+     -->
+    <bean id="myFactoryBeanImple" class="edu.fdzc.factory.MyFactoryBeanImple"/>
+</beans>

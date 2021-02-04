@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="edu.fdzc"/>
+    <!--
+        基于注解的AOP
+        1. 将目标类和切面类都加入到ioc容器中：@Component
+        2. 告诉Spring哪个是切面类：@Aspect
+        3. 在切面类中使用五个通知注解来配置切面中的这些通知方法都何时何地运行
+        4. 开启基于注解的AOP功能
+     -->
+
+    <!-- 将目标类和切面类都加入到ioc容器中：@Component -->
+    <bean id="myMathCalculator" class="edu.fdzc.impl.MathCalculator"/>
+    <bean id="validateAspect" class="edu.fdzc.utils.ValidateAspect"/>
+    <bean id="logUtils" class="edu.fdzc.utils.LogUtils"/>
+
+    <!-- 告诉Spring哪个是切面类 -->
+    <aop:config>
+        <aop:pointcut id="globalPointcut" expression="execution(* edu.fdzc.impl.*.*(..))"/>
+        <!-- 指定切面 -->
+        <aop:aspect ref="logUtils" order="2">
+            <!-- 前置通知 -->
+            <aop:before method="logStart" pointcut="execution(* edu.fdzc.impl.*.*(..))"/>
+            <!-- 返回通知 -->
+            <aop:after-returning method="logReturn" pointcut-ref="globalPointcut" returning="result"/>
+            <!-- 异常通知 -->
+            <aop:after-throwing method="logException" pointcut-ref="globalPointcut" throwing="exception"/>
+            <!-- 后置通知 -->
+            <aop:after method="logEnd" pointcut-ref="globalPointcut"/>
+        </aop:aspect>
+
+        <aop:aspect ref="validateAspect" order="1">
+            <!-- 前置通知 -->
+            <aop:before method="logEnd" pointcut-ref="globalPointcut"/>
+            <!-- 返回通知 -->
+            <aop:after-returning method="logReturn" pointcut-ref="globalPointcut" returning="result"/>
+            <!-- 异常通知 -->
+            <aop:after-throwing method="logException" pointcut-ref="globalPointcut" throwing="exception"/>
+            <!-- 后置通知 -->
+            <aop:after method="logEnd" pointcut-ref="globalPointcut"/>
+        </aop:aspect>
+    </aop:config>
+
+    <!--
+        注解：快速方便
+        配置：功能完善；重要的用配置，不重要的用注解：方便浏览之间的关系
+    -->
+</beans>

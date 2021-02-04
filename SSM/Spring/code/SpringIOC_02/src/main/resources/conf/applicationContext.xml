@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+        创建带有生命周期方法的bean
+        生命周期：bean的创建到销毁
+        ioc容器中注册的bean：
+            1.单例bean：容器启动时就会创建好，容器关闭也会销毁创建的bean
+            2.多实例bean：获取的时候才创建
+        可以为bean自定义一些生命周期的方法；spring在创建或销毁时就是调用指定方法
+        自定义初始化方法和销毁方法必须是无参的
+    -->
+    <bean id="book01" class="fdzc.beans.Book"
+          init-method="myInit"
+          destroy-method="myDestory" />
+
+    <!--
+        bean的后置处理器：BeanProcessor
+        Spring有一个接口：后置处理器：可以在bean的初始化前后调用方法
+     -->
+    <bean id="beanPostProcessor" class="fdzc.beans.MyBeanProcessor"/>
+
+</beans>

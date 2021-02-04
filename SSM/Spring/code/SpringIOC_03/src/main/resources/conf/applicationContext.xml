@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--
+        通过注解反别创建Dao、Service、Controller（控制器：控制网页跳转逻辑Servlet）
+        通过给bean上添加某些注解，可以快速的将bean加入ioc容器中
+        某个类上添加任何一个注解都能快速的将这个组件加入到ioc容器的管理中
+        Spring四大注解
+        @Controller：控制器：推荐给控制器层的组件添加
+        @Service：业务逻辑：推荐给业务逻辑层的组件添加
+        @Repository：仓库：推荐给数据库层（数据持久化层：dao层）的组件添加
+        @Component：推荐不属于上面三层的组件添加
+
+        注解可随意添加：Spring底层不会去验证这个组件，但是推荐各自层使用各自的注解
+        该规范是为了帮助他人查看
+
+        使用注解将组件加入IOC容器：
+        1.给要添加的组件使用以上任意一个注解
+        2.配置Spring自动扫描添加注解的组件；依赖context名称空间
+            3.需要导入AOP包：需要有AOP支持作为前提
+    -->
+
+    <!--
+        context:component-scan：自动组件扫描
+        base-package：指定扫描的基础包；
+        把基础包及其下面所有的包的所有加了注解的类自动扫描进IOC容器
+    -->
+    <context:component-scan base-package="edu.fdzc">
+    </context:component-scan>
+
+    <!--
+        使用context:exclude-filter指定扫描时不包含的类
+        扫描的时候可以排除一些不需要的组件
+    -->
+<!--    <context:component-scan base-package="edu.fdzc">-->
+        <!--
+            type="annotation"：指定排除规则；按照注解进行排除：即标注了注解的不扫描
+                expression=""：注解的全类名
+            type="assignable"：指定排除某个具体类，按照类排除
+                expression=""：类的全类名
+            type="aspectj"：aspectj表达式
+            type="custom"：自定义一个TypeFilter；自定义过滤规则
+            type="regex"：正则表达式
+         -->
+<!--        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>-->
+<!--    </context:component-scan>-->
+
+    <!--
+        使用context:include-filter指定扫描时要包含的类
+        只扫描需要的组件；默认全部扫描
+        一定要禁用默认的过滤规则：use-default-filters="false"
+    -->
+<!--    <context:component-scan base-package="edu.fdzc" use-default-filters="false">-->
+<!--        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>-->
+<!--        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>-->
+<!--    </context:component-scan>-->
+
+    <!--
+        DI(依赖注入)
+        使用@Autowired注解实现根据类型实现自动装配
+        为某属性使用@Autowired：Sping会自动的为该属性赋值
+        前提：在容器中存在该组件才能使用自动装配
+
+        原理：
+        例：
+        @Autowired
+        private BookService bookService;
+        1.先按照类型去容器中找到对应的组件：bookService = ioc.getBean("BookService.class)
+            若找到则赋值
+            未找到抛出异常
+            存在多个同类型：
+                按照变量名作为id继续匹配
+                    匹配则装配
+                    未匹配则报错
+                @Qualifier：指定一个名称作为id，让Spring不使用变量名做为id
+                    匹配则装配
+                    未匹配则报错
+
+        Autowired标注的自动装配的属性默认是一定装配上的；
+        若修改为：@autowired(require=false)
+            匹配则装配；未匹配则装配为null
+
+        在方法上使用@Autowired：
+        这个方法会在bean创建的时候自动运行
+        这个方法上的每一个参数都会自动装配
+    -->
+    <context:component-scan base-package="edu.fdzc">
+
+    </context:component-scan>
+
+    <!--
+        @Autowired,@Resource,@Inject 都是自动装配的意思
+        @Autowired：Spring的注解，最强大
+        @Resource：j2ee的注解
+        @Inject：EJB
+
+        @Autowired 和 @Resource
+        @Resource：扩展性更强；因为是java标准，如果切换成其他框架还是能够使用
+        @Autowired：依赖于Spring框架
+     -->
+</beans>

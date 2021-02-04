@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="car" class="fdzc.beans.Car">
+        <property name="carName" value="BMW"/>
+        <property name="color" value="white"/>
+    </bean>
+
+<!--    <bean id="car02" class="fdzc.beans.Car">-->
+<!--        <property name="carName" value="Audi"/>-->
+<!--        <property name="color" value="black"/>-->
+<!--    </bean>-->
+    <!--
+        为Person中的自定义类型赋值
+        property：手动赋值
+        自动赋值：（自动装配）
+
+        自动装配
+        autowire = "default"or"no"：不自动装配：不自动为car属性赋值
+
+        按照某种规则自动装配
+        autowire = "byName"：按照名字
+            private Car car：
+            以属性名（car）作为id去容器中找到这个组件，为其赋值；找不到则赋值为null
+            例：car = ioc.getBean("car");
+
+        autowire = "byType"：
+            private Car car：按照类型
+            以属性的类型作为查找依据去容器中找到这个组件；如果同种类型存在多个，则报错；找不到则赋值为null
+            例：car = ioc.getBean(Car.class);
+
+        autowire = "constructor"：按照构造器
+            public Person(Car car)：按照构造器进行赋值
+            先按照有参构造器参数的类型进行装配，匹配成功则赋值；找不到则赋值为null
+            如果按照类型匹配到了多个；参数的名称作为id继续匹配；匹配成功则赋值；找不到则赋值为null
+            不会报错
+     -->
+    <bean id="person" class="fdzc.beans.Person" autowire="byType">
+
+    </bean>
+
+    <!-- List<Book> books：容器可以把容器中的所有book封装成list赋值给这个属性 -->
+    <bean id="book01" class="fdzc.beans.Book">
+        <property name="bookName" value="book01"/>
+    </bean>
+    <bean id="book02" class="fdzc.beans.Book">
+        <property name="bookName" value="book02"/>
+    </bean>
+    <bean id="book03" class="fdzc.beans.Book">
+        <property name="bookName" value="book03"/>
+    </bean>
+
+    <!--
+        SpEL(Spring Expression Language)Spring表达式语言
+     -->
+    <bean id="person02" class="fdzc.beans.Person">
+        <!-- 字面量：${}; #{} -->
+        <!-- 使用运算符 -->
+        <property name="age" value="#{12 * 5}"/>
+        <!-- 引用其他bean的某个属性值 -->
+        <property name="lastName" value="#{book01.bookName}"/>
+        <!-- 引用其他bean -->
+        <property name="car" value="#{car}"/>
+        <!--
+            调用非静态方法
+            调用静态方法：
+                例：UUID.randomUUID().toString();
+                #{T(全类名).静态方法名(1, 2)}
+         -->
+        <property name="gender" value="#{book01.getBookName()}"/>
+        <property name="email" value="#{T(java.util.UUID).randomUUID().toString().substring(0, 5)}"/>
+    </bean>
+</beans>

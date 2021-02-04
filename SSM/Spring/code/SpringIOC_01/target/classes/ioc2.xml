@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--
+        正确的为各种属性赋值
+        测试实验 null 值
+        引用类型赋值
+        集合类型赋值
+        级联属性赋值
+    -->
+    <bean id="car01" class="edu.fdzc.beans.Car">
+        <property name="carName" value="BMW"/>
+        <property name="color" value="gray"/>
+        <property name="price" value="5000000"/>
+    </bean>
+
+    <bean id="book01" class="edu.fdzc.beans.Book">
+        <property name="bookName" value="《三国演义》"/>
+    </bean>
+
+    <bean id="person01" class="edu.fdzc.beans.Person">
+        <property name="lastName">
+            <!-- 进行复杂赋值 -->
+            <null/>
+        </property>
+
+        <!-- ref：引用外面的值 -->
+        <!-- <property name="car" ref="car01"/> -->
+        <property name="car">
+            <!-- 定义内部bean -->
+            <bean class="edu.fdzc.beans.Car">
+                <property name="carName" value="Audi"/>
+                <property name="color" value="red"/>
+                <property name="price" value="1300000"/>
+             </bean>
+        </property>
+
+        <property name="books">
+            <!-- books = new ArrayList<Book>(); -->
+            <list>
+                <!-- list标签中添加每一个元素 -->
+                <!-- 内部bean不能被外部获取，仅能在内部使用 -->
+                <bean id="book000x" class="edu.fdzc.beans.Book" p:bookName="水浒传"/>
+                <ref bean="book01"/>
+            </list>
+        </property>
+
+        <!-- Map<String, Object> maps -->
+        <property name="map">
+            <!-- map = new LinkedHashMap<>(); -->
+            <map>
+                <!-- 一个entry代表一个键值对 -->
+                <entry key="key01" value="张三"/>
+                <entry key="key02" value="18"/>
+                <entry key="key03" value-ref="book01"/>
+                <entry key="key04">
+                    <bean class="edu.fdzc.beans.Car">
+                        <property name="carName" value="BMW"/>
+                    </bean>
+                </entry>
+                <!--
+                <entry key="key05">
+                    <map></map>
+                </entry>
+                -->
+            </map>
+        </property>
+
+        <property name="properties">
+            <!-- properties = new properties(); 所有key-value都是String类型-->
+            <props>
+                <!-- k=v都是String类型：值直接写在标签体中 -->
+                <prop key="userName">root</prop>
+                <prop key="passWord">123456</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- util名称空间创建集合类型的Bean：方便他人引用 -->
+    <bean id="person02" class="edu.fdzc.beans.Person">
+        <property name="map" ref="myMap"/>
+    </bean>
+
+    <!-- 相当于new LinkedHashMap<>(); -->
+    <util:map id="myMap">
+        <!-- 添加元素 -->
+        <entry key="key01" value="张三"/>
+        <entry key="key02" value="18"/>
+        <entry key="key03" value-ref="book01"/>
+        <entry key="key04">
+            <bean class="edu.fdzc.beans.Car">
+                <property name="carName" value="BMW"/>
+            </bean>
+        </entry>
+    </util:map>
+
+    <!--
+        内容组成：四个元素
+        [], Person, 12, {}
+    -->
+    <util:list id="myList">
+        <list/>
+        <bean class="edu.fdzc.beans.Person"/>
+        <value>12</value>
+        <ref bean="myMap"/>
+    </util:list>
+
+    <!-- 级联属性 -->
+    <bean id="person03" class="edu.fdzc.beans.Person">
+        <!-- 为car赋值时，并改变其价格 -->
+        <property name="car" ref="car01"/>
+        <property name="car.price" value="900000"/>
+    </bean>
+
+    <!-- 通过继承实现bean配置信息的重用 -->
+    <!-- abstract="true"：这个bean的配置是抽象的，不能获取它的实例，其只能被继承 -->
+    <bean id="person04" class="edu.fdzc.beans.Person" abstract="true">
+        <property name="lastName" value="CAI"/>
+        <property name="gender" value="男"/>
+        <property name="age" value="22"/>
+        <property name="email" value="viicescai@outlook.com"/>
+    </bean>
+
+    <!-- parent：指定当前 bean 的配置信息继承于哪个 -->
+    <bean id="person05" class="edu.fdzc.beans.Person" parent="person04">
+        <property name="lastName" value="Viices"/>
+    </bean>
+</beans>
