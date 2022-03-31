@@ -10,7 +10,7 @@
 
     <!-- 同一Spring版本号 -->
     <properties>
-        <springVersion>4.0.0.RELEASE</springVersion>
+        <springVersion>5.3.18</springVersion>
     </properties>
 
     <dependencies>
